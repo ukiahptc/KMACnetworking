@@ -182,6 +182,7 @@ const LAYERS=[
   {id:'booth', name:'회원사 · 전시·발표',color:'#2563eb'},
   {id:'ir',    name:'회원사 · IR',      color:'#9333ea'},
   {id:'ops',   name:'운영진',           color:'#0d9488'},
+  {id:'vc',    name:'VC (협의 필요)',    color:'#be185d'},
 ];
 // 평면 좌표(기존 동선 평면도 SVG 좌표계) → 3D. 1칸 = 0.1 단위
 const S=0.1;
@@ -218,7 +219,7 @@ const F1_CORES=[R(551,322,75,25),R(543,363,83,25),R(543,388,10,22),R(678,440,40,
 const GEO_F1={
   walk:[F1_FLOOR,R(418,258,42,26),R(698,294,20,22)],
   blocks:[...F1_CORES,...F1_REG.map(([x,y])=>rpoly(x,y,15,6,60)),R(543,322,83,66),R(626,322,24,70),R(356,322,36,24),R(502,305,58,28),F1_ESC,{c:[518,398,8]}], // 엘리베이터 홀 통과 불가
-  walls:[...F1_OUT,...F1_VEST,...F1_VEST_E,...F1_ROOMWALLS,[548,437,548,478]],
+  walls:[...F1_OUT,...F1_VEST,...F1_VEST_E,...F1_ROOMWALLS,[548,437,548,478],[650,322,663,322]],
 };
 /* ───── 지하 1층 ───── */
 const B1_HALLWALLS=[[400,172,400,262],[400,262,420,262],[436,262,457,262],[473,262,495,262],[511,262,598,262],[598,262,598,172]];
@@ -241,6 +242,9 @@ function dim(v,g,a,b,txt,ticks){ const [x1,z1]=W(v,...a),[x2,z2]=W(v,...b); cons
   const n=ticks?12:1; for(let k=0;k<=n;k++){ const t=k/n, tk=new THREE.Mesh(new THREE.BoxGeometry(.05,.03,.45),mat); tk.position.set(x1+(x2-x1)*t,.06,z1+(z2-z1)*t); tk.rotation.y=ln.rotation.y; g.add(tk); }
   const el=document.createElement('div'); el.className='area s dim'; el.textContent=txt; const o=new CSS2DObject(el); o.position.set((x1+x2)/2,.25,(z1+z2)/2); g.add(o); }
 const TBL={L:1.8,D:.6,CH:.55}; // 1800×600 테이블, 의자 중심까지 거리(m)
+// 전시 테이블(고정): 벽에서 1.5m 띄워 벽과 나란히. 오른쪽 1~5(무대 쪽부터), 왼쪽 6~10
+const EXPO=[...[70,108,146,184,222].map((y,i)=>({id:'e'+(i+1),n:i+1,x:282.6,y,r:90,c:0})),
+            ...[70,108,146,184,222].map((y,i)=>({id:'e'+(i+6),n:i+6,x:17.4,y,r:90,c:0}))];
 function defaultTables(){ const out=[]; let n=0; for(let k=0;k<10;k++){ const y=88+17*k;
   for(const x of [50,73,96,119,181,204,227,250]) out.push({id:'t'+(n++),x,y,r:0,c:3}); } return out; }
 const chairSides=t=>t.c===6?[1,-1]:t.c===3?[t.b?-1:1]:[];
@@ -254,6 +258,7 @@ function geoHall(seat){
   if(seat==='theater') blocks.push(R(36,76,106,178),R(158,76,106,178));
   if(seat==='round') ROUND.forEach(([x,y])=>blocks.push({c:[x,y,16]}));
   if(seat==='rect') (state.tables||[]).forEach(t=>blocks.push(tableFoot(t)));
+  EXPO.forEach(t=>blocks.push(tableFoot(t)));
   return {walk:[R(0,0,300,320)], blocks,
     walls:[[0,0,300,0],[300,0,300,320],[300,320,0,320],[0,320,0,0],[50,32,105,32],[195,32,250,32],[50,0,50,8],[250,0,250,8]]};
 }
@@ -272,26 +277,27 @@ const SEED={
   shown:[],
   places:{
     f1:[
-      {id:'f1_gate',n:'정문',x:439,y:272},
-      {id:'f1_east',n:'동측 출입문',x:709,y:305},
+      {id:'f1_gate',n:'정문 (사이니지 월 정면)',x:439,y:272},
+      {id:'f1_east',n:'측면 정문 (긴 복도)',x:709,y:305},
+      {id:'f1_elevP',n:'엘리베이터 (주차장→1층 · NIPA 도착)',x:538,y:355},
       {id:'f1_lobby',n:'메인 로비',x:440,y:305},
       {id:'f1_media',n:'미디어월',x:433,y:335},
       {id:'f1_desk',n:'안내데스크',x:374,y:334},
       {id:'f1_reg',n:'접수 테이블',x:500,y:363},
-      {id:'f1_flap',n:'보안검색대',x:477,y:362},
-      {id:'f1_sec',n:'게이트',x:548,y:424},
-      {id:'f1_esc',n:'에스컬레이터',x:481,y:372,go:'b1'},
+      {id:'f1_flap',n:'보안게이트 (에스컬레이터 · 당일 개방)',x:477,y:362},
+      {id:'f1_sec',n:'게이트 (접견실·VIP룸)',x:548,y:424},
+      {id:'f1_esc',n:'에스컬레이터 ↓↑ (2단 · 중간 환승)',x:481,y:372,go:'b1'},
       {id:'f1_brand',n:'브랜드존',x:530,y:318},
       {id:'f1_vip',n:'VIP룸',x:635,y:406},
-      {id:'f1_ir',n:'미팅룸 1 · VC IR 피칭',x:682,y:341},
-      {id:'f1_mr2',n:'미팅룸 2 · VC IR 피칭',x:682,y:380},
-      {id:'f1_mr3',n:'미팅룸 3 · VC IR 피칭',x:682,y:418},
+      {id:'f1_ir',n:'접견실 9 · ROOM A (IR 피칭 · VC 3명)',x:682,y:341},
+      {id:'f1_mr2',n:'접견실 10 · ROOM B (IR 피칭 · VC 2명)',x:682,y:380},
+      {id:'f1_mr3',n:'접견실 (미사용)',x:682,y:418},
       {id:'f1_play',n:'플레이존',x:612,y:308},
       {id:'f1_cafe',n:'카페',x:522,y:452},
       {id:'f1_stairs',n:'계단',x:668,y:458},
     ],
     b1:[
-      {id:'b1_esc',n:'에스컬레이터 도착',x:505,y:324,go:'f1'},
+      {id:'b1_esc',n:'에스컬레이터 ↓↑ 도착',x:505,y:324,go:'f1'},
       {id:'b1_gate',n:'게이트',x:507,y:312},
       {id:'b1_lobby',n:'컨벤션홀 로비',x:458,y:292},
       {id:'b1_d1',n:'출입문 1 (폐쇄)',x:503,y:270},
@@ -308,31 +314,34 @@ const SEED={
     ],
     hall:[
       {id:'h_stage',n:'무대',x:150,y:16},
-      {id:'h_podium',n:'연단',x:72,y:22},
-      {id:'h_talk',n:'대담석',x:150,y:22},
+      {id:'h_podium',n:'포디움 (무대 아래 · 사용 안 함)',x:33,y:54},
+      {id:'h_up',n:'등단·하단 (무대 오른쪽)',x:256,y:26},
+      {id:'h_expoR',n:'전시 구역 1~5',x:266,y:146},
+      {id:'h_expoL',n:'전시 구역 6~10',x:34,y:146},
       {id:'h_vip',n:'VIP석',x:150,y:66},
       {id:'h_seat',n:'일반석',x:150,y:190},
       {id:'h_net',n:'네트워킹 라운지',x:150,y:288},
       {id:'h_d1',n:'출입문 1 (폐쇄)',x:292,y:57},
       {id:'h_d2',n:'출입문 2 (폐쇄)',x:292,y:151},
-      {id:'h_d3',n:'출입문 3',x:292,y:245,go:'b1'},
-      {id:'h_rearL',n:'후면 출입문 (좌)',x:24,y:312},
-      {id:'h_rearR',n:'후면 출입문 (우)',x:276,y:312},
+      {id:'h_d3',n:'출입문 3 (맨 뒤 · 유일한 출입구)',x:292,y:245,go:'b1'},
       {id:'h_ctrl',n:'조정실',x:150,y:312},
     ],
   },
   routes:{
-    vip:{f1:[{m:'auto',s:['f1_gate','f1_lobby','f1_flap','f1_sec','f1_vip']},{m:'auto',s:['f1_east','f1_vip']},{m:'auto',s:['f1_vip','f1_sec','f1_flap','f1_esc']}],
+    vip:{f1:[{m:'auto',s:['f1_gate','f1_lobby','f1_sec','f1_vip']},{m:'auto',s:['f1_east','f1_sec','f1_vip']},{m:'auto',s:['f1_elevP','f1_sec','f1_vip']},{m:'auto',s:['f1_vip','f1_sec','f1_flap','f1_esc']}],
          b1:[{m:'auto',s:['b1_esc','b1_gate','b1_lobby','b1_d3']}], hall:[{m:'auto',s:['h_d3','h_vip']}]},
-    member:{f1:[{m:'auto',s:['f1_gate','f1_reg','f1_flap','f1_esc']}],
+    member:{f1:[{m:'auto',s:['f1_gate','f1_reg','f1_flap','f1_esc']},{m:'auto',s:['f1_east','f1_reg','f1_flap','f1_esc']}],
          b1:[{m:'auto',s:['b1_esc','b1_gate','b1_lobby','b1_d3']}], hall:[{m:'auto',s:['h_d3','h_net']}]},
     booth:{f1:[{m:'auto',s:['f1_gate','f1_reg','f1_flap','f1_esc']}],
-         b1:[{m:'auto',s:['b1_esc','b1_gate','b1_d3']}], hall:[{m:'auto',s:['h_d3','h_seat']}]},
-    ir:{f1:[{m:'auto',s:['f1_gate','f1_reg','f1_flap','f1_sec','f1_ir']}], b1:[], hall:[]},
-    ops:{f1:[], b1:[{m:'auto',s:['b1_elevE','b1_lobby','b1_d3']}], hall:[{m:'auto',s:['h_rearR','h_ctrl']}]},
+         b1:[{m:'auto',s:['b1_esc','b1_gate','b1_d3']}], hall:[{m:'auto',s:['h_d3','h_expoR']},{m:'auto',s:['h_d3','h_expoL']}]},
+    ir:{f1:[{m:'auto',s:['f1_gate','f1_reg','f1_flap','f1_esc']},{m:'auto',s:['f1_esc','f1_sec','f1_ir']},{m:'auto',s:['f1_esc','f1_sec','f1_mr2']}],
+         b1:[{m:'auto',s:['b1_esc','b1_gate','b1_lobby','b1_d3']}], hall:[{m:'auto',s:['h_d3','h_seat']}]},
+    ops:{f1:[], b1:[{m:'auto',s:['b1_elevE','b1_lobby','b1_d3']}], hall:[{m:'auto',s:['h_d3','h_ctrl']}]},
+    vc:{f1:[{m:'auto',s:['f1_gate','f1_reg','f1_sec','f1_ir']},{m:'auto',s:['f1_ir','f1_sec','f1_flap','f1_esc']}],
+        b1:[{m:'auto',s:['b1_esc','b1_gate','b1_lobby','b1_d3']}], hall:[{m:'auto',s:['h_d3','h_up','h_stage']}]},
   },
 };
-const KEY='networking-3d:v7';
+const KEY='networking-3d:v8';
 const clone=o=>JSON.parse(JSON.stringify(o));
 let state=clone(SEED);
 try{ const s=localStorage.getItem(KEY); if(s){ const d=JSON.parse(s); if(d&&d.places&&d.routes) state=Object.assign(clone(SEED),d); } }catch(e){}
@@ -519,11 +528,13 @@ function buildF1(){
   flapGates(v,g,548,424,22,90,5); glass(v,g,[548,437,548,478],1.2);
   // 코어와 미팅룸 사이: 룸 (통과 불가)
   prism(v,g,R(626,322,24,70),2.6,M.wall); area(v,g,'룸',638,357,2.8,true);
+  wall(v,g,[650,322,663,322],2.6,.25,M.wall); // 접견실 통로 북쪽 입구 없음 (게이트로만 진입)
   // 1층 엘리베이터 홀: 사용 불가
   plane(v,g,551,347,75,16,new THREE.MeshBasicMaterial({color:0xd94a3a,transparent:true,opacity:.35,depthWrite:false}),.012);
-  area(v,g,'⛔ 엘리베이터 사용 불가',588,355,.3,true);
+  area(v,g,'⛔ 행사 중 엘리베이터 사용 안 함 (NIPA 주차장 도착만)',588,355,.3,true);
   // 에스컬레이터
-  prism(v,g,[[472,376],[481,374],[497,431],[488,434]],.14,M.dark); glass(v,g,[472,376,488,434],1); glass(v,g,[490,372,506,428],1.1);
+  prism(v,g,[[472,376],[476.5,375],[492.5,432.5],[488,434]],.14,M.dark); prism(v,g,[[476.5,375],[481,374],[497,431],[492.5,432.5]],.14,M.gray);
+  area(v,g,'↓',482,395,.5,true); area(v,g,'↑',487,393,.5,true); area(v,g,'에스컬레이터 2단 · 중간 층 환승',470,440,.6,true); glass(v,g,[472,376,488,434],1); glass(v,g,[490,372,506,428],1.1);
   for(let k=0;k<10;k++){ const t0=k/10, t1=(k+1)/10, L=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
     prism(v,g,[L([481,374],[497,431],t0),L([490,372],[506,428],t0),L([490,372],[506,428],t1),L([481,374],[497,431],t1)],.16*(k+1),M.stone); }
   area(v,g,'계단 (2층)',505,422,1.9,true);
@@ -534,7 +545,7 @@ function buildF1(){
   slab(v,g,F1_GARDEN,null,-1.8,.2,M.green);
   F1_GARDEN.forEach((p,i)=>{ const q=F1_GARDEN[(i+1)%F1_GARDEN.length]; wall(v,g,[p[0],p[1],q[0],q[1]],1.76,.12,M.under,-1.8); glass(v,g,[p[0],p[1],q[0],q[1]],.9); });
   [[410,410],[438,402],[402,446],[440,452],[422,430]].forEach(([x,y])=>{ const [a,b]=W(v,x,y); tree(g,a,-1.8,b,1.1); });
-  area(v,g,'선큰 가든',420,440,-.3); area(v,g,'미팅룸',680,316,2.8,true); area(v,g,'로봇 조형물',518,398,2,true);
+  area(v,g,'선큰 가든',420,440,-.3); area(v,g,'접견실 (IR 피칭룸)',680,316,2.8,true); area(v,g,'로봇 조형물',518,398,2,true);
   area(v,g,'메인 로비',520,292,.2);
   underlay(v,g);
 }
@@ -568,7 +579,8 @@ function buildB1(){
   B1_GARDEN.forEach((p,i)=>{ const q=B1_GARDEN[(i+1)%B1_GARDEN.length]; glass(v,g,[p[0],p[1],q[0],q[1]],2.6); });
   [[440,345],[462,372],[425,400],[455,412],[440,380]].forEach(([x,y])=>{ const [a,b]=W(v,x,y); tree(g,a,.08,b,1.15); });
   // 에스컬레이터·게이트
-  prism(v,g,B1_ESC,.14,M.dark); glass(v,g,[500,330,509,361],1); glass(v,g,[512,325,521,356],1);
+  prism(v,g,[[500,330],[506,327.5],[515,358.5],[509,361]],.14,M.dark); prism(v,g,[[506,327.5],[512,325],[521,356],[515,358.5]],.14,M.gray);
+  area(v,g,'에스컬레이터 ↓↑ (중간 층 환승 후 도착)',530,368,.6,true); glass(v,g,[500,330,509,361],1); glass(v,g,[512,325,521,356],1);
   flapGates(v,g,507,320,18,-18,4);
   // 푸드코트
   plane(v,g,240,300,138,106,M.woodFloor,.008);
@@ -624,11 +636,6 @@ function buildHall(){
   // 무대·계단
   box(v,g,50,0,200,32,.8,M.stageWood);
   { const navy=new THREE.MeshStandardMaterial({color:0x1f2a4a,roughness:.95}); box(v,g,50,31.5,55,1,.8,navy,0,false); box(v,g,195,31.5,55,1,.8,navy,0,false); }
-  for(const x of [138,162]){ const [a,b]=W(v,x,14), beige=new THREE.MeshStandardMaterial({color:0xd8c4a8,roughness:.9});
-    const seat=edged(mk(new THREE.BoxGeometry(.75,.45,.7),beige)); seat.position.set(a,1.03,b); g.add(seat);
-    const back=edged(mk(new THREE.BoxGeometry(.75,.6,.14),beige)); back.position.set(a,1.45,b-.3); g.add(back); }
-  box(v,g,128,4,44,5,.45,M.leaf,.8);
-  for(let k=0;k<9;k++){ const [a,b]=W(v,131+k*4.6,6.5); const f=mk(new THREE.SphereGeometry(.13,8,6),M.white); f.position.set(a,1.32,b); g.add(f); }
   for(let k=0;k<3;k++) box(v,g,105,32,90,12-k*4,.8*(k+1)/3,M.stageWood);
   for(let k=0;k<3;k++){ box(v,g,38+k*4,8,12-k*4,24,.8*(k+1)/3,M.stageWood); box(v,g,250,8,12-k*4,24,.8*(k+1)/3,M.stageWood); }
   // 스크린
@@ -636,9 +643,8 @@ function buildHall(){
     const s=new THREE.Mesh(new THREE.PlaneGeometry(14,4.1),new THREE.MeshStandardMaterial({color:0xf4f3ef,emissive:0x2a2a28,roughness:.9})); s.position.set(a,4,b+.42); g.add(s); }
   // 라인어레이 스피커
   for(const x of [62,238]){ const [a,b]=W(v,x,6); for(let k=0;k<6;k++){ const s=mk(new THREE.BoxGeometry(1.1,.36,.6),M.dark); s.position.set(a,5.8-k*.4,b+.1*k); s.rotation.x=.04*k; g.add(s); } }
-  // 연단
-  { const [a,b]=W(v,72,16); const p=edged(mk(new THREE.BoxGeometry(.65,1.15,.5),M.white)); p.position.set(a,.8+.575,b); g.add(p);
-    const mic=mk(new THREE.CylinderGeometry(.01,.01,.4),M.dark); mic.position.set(a,2.1,b+.1); mic.rotation.x=-.4; g.add(mic); }
+  // 포디움: 무대 아래 왼쪽, 사용하지 않음 (무선 마이크로 무대 오른쪽 등단·하단)
+  { const [a,b]=W(v,33,46); const p=edged(mk(new THREE.BoxGeometry(.65,1.15,.5),M.white)); p.position.set(a,.575,b); g.add(p); }
   // 조명 트러스
   for(const y of [40,105]){ const [,b]=W(v,0,y); const t=mk(new THREE.BoxGeometry(24,.14,.14),M.dark); t.position.set(0,6.1,b); g.add(t);
     for(let x=-10;x<=10;x+=2.5){ const l=mk(new THREE.CylinderGeometry(.12,.16,.4,8),M.gray); l.position.set(x,5.8,b); l.rotation.x=-.5; g.add(l); } }
@@ -649,7 +655,12 @@ function buildHall(){
   // 실측 치수선
   dim(v,g,[289,HALL_DOORS[0]+9],[289,HALL_DOORS[2]-9],'출입문 1 끝 ~ 3 시작 17 m');
   dim(v,g,[0,316],[300,316],'뒤쪽 벽 2.15 m × 12칸 = 25.8 m',true);
-  [18,270].forEach(x=>{ const [a,b]=W(v,x+6,319); const d=edged(mk(new THREE.BoxGeometry(1.2,2.4,.1),M.dark)); d.position.set(a,1.2,b-.12); g.add(d); });
+  // 전시 테이블 10개 (양쪽 벽을 따라 5개씩, 고정) — 오른쪽은 폐쇄된 출입문 1·2 앞
+  { const cloth=new THREE.MeshStandardMaterial({color:0x1f2a4a,roughness:.95}), topM=new THREE.MeshStandardMaterial({color:0xf3f4f6,roughness:.5});
+    EXPO.forEach(t=>{ const [a,b]=W(v,t.x,t.y); const grp=new THREE.Group(); grp.position.set(a,0,b); grp.rotation.y=t.r*Math.PI/180;
+      const body=edged(mk(new THREE.BoxGeometry(TBL.L,.72,TBL.D),cloth)); body.position.y=.36; grp.add(body);
+      const top=edged(mk(new THREE.BoxGeometry(TBL.L,.03,TBL.D),topM)); top.position.y=.735; grp.add(top); g.add(grp);
+      area(v,g,'전시 '+t.n,t.x,t.y,1.1,true); }); }
   { const [a,b]=W(v,150,319); const w=new THREE.Mesh(new THREE.PlaneGeometry(12,1.2),new THREE.MeshStandardMaterial({color:0x26323a,roughness:.15,metalness:.3})); w.position.set(a,3.7,b-.17); w.rotation.y=Math.PI; g.add(w); }
   sc.seatGroup=new THREE.Group(); g.add(sc.seatGroup);
   area(v,g,'스크린',150,4,6.5,true);
@@ -690,6 +701,7 @@ const HALL_W=(()=>{ const [x0,z0]=W('hall',0,0),[x1,z1]=W('hall',300,320); retur
 function collides(t){ const F=footW(t);
   if(F.some(([x,z])=>x<HALL_W[0]||x>HALL_W[2]||z<HALL_W[1]||z>HALL_W[3])) return 'wall';
   if(satOverlap(F,STAGE_W)) return 'stage';
+  for(const o of EXPO) if(satOverlap(F,footW(o))) return 'expo';
   for(const o of state.tables) if(o.id!==t.id&&satOverlap(F,footW(o))) return 'table';
   return null; }
 function overlapCount(){ let n=0; const T=state.tables, F=T.map(footW); for(let i=0;i<T.length;i++) for(let j=i+1;j<T.length;j++) if(satOverlap(F[i],F[j])) n++; return n; }
@@ -698,7 +710,7 @@ function settle(t,maxR=2.5){ if(!collides(t)) return true; const x0=t.x,y0=t.y, 
   for(let r=.1;r<=maxR+1e-6;r+=.1){ const n=Math.max(8,Math.round(r*24));
     for(let k=0;k<n;k++){ const a=k/n*Math.PI*2; t.x=x0+r*Math.cos(a)/sx; t.y=y0+r*Math.sin(a)/S; if(!collides(t)) return true; } }
   t.x=x0; t.y=y0; return false; }
-const BUMP={wall:'벽에 닿아',stage:'무대와 겹쳐',table:'다른 테이블과 겹쳐'};
+const BUMP={wall:'벽에 닿아',stage:'무대와 겹쳐',table:'다른 테이블과 겹쳐',expo:'전시 테이블과 겹쳐'};
 let tableHits=[], tableGroups={}, selTable=null, tdrag=null;
 function uiTables(){ const n=(state.tables||[]).length, c=(state.tables||[]).reduce((a,t)=>a+t.c,0);
   if(!$('tCount')) return; const ov=overlapCount(); $('tCount').textContent=`테이블 ${n}개 · 의자 ${c}석 (1800×600)`+(ov?` · ⚠ 겹친 곳 ${ov}군데`:'');
