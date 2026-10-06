@@ -212,7 +212,7 @@ const F1_ROOMWALLS=[...F1_MR.flatMap(([a,b])=>{const c=(a+b)/2;return[[663,a,697
   ...(([x0,y0,x1,y1])=>{const c=(y0+y1)/2;return[[x0,y0,x1,y0],[x0,y1,x1,y1],[x0,y0,x0,y1],[x1,y0,x1,c-5],[x1,c+5,x1,y1]];})(F1_VIPR)];
 const F1_GARDEN=[[400,395],[418,386],[448,388],[456,402],[458,440],[442,470],[425,478],[395,468],[382,445],[382,418]];
 const F1_ESC=[[472,376],[490,372],[506,428],[488,434]];
-const F1_REG=[[509,350],[517,364]]; // 접수 테이블 2개 (11시→5시 대각선), 사람은 테이블 서쪽(앞)으로 지나감
+const F1_REG=[[509,350],[517,364]]; // 접수테이블 2개 (11시→5시 대각선), 사람은 테이블 서쪽(앞)으로 지나감
 function rpoly(cx,cy,w,d,deg){ const a=deg*Math.PI/180, u=[Math.cos(a),Math.sin(a)], n=[-u[1],u[0]];
   return [[1,1],[1,-1],[-1,-1],[-1,1]].map(([i,j])=>[cx+u[0]*w/2*i+n[0]*d/2*j, cy+u[1]*w/2*i+n[1]*d/2*j]); }
 const F1_CORES=[R(551,322,75,25),R(543,363,83,25),R(543,388,10,22),R(678,440,40,38)];
@@ -282,8 +282,8 @@ const SEED={
       {id:'f1_elevP',n:'엘리베이터 (주차장→1층 · NIPA 도착)',x:538,y:355},
       {id:'f1_lobby',n:'메인 로비',x:440,y:305},
       {id:'f1_media',n:'미디어월',x:433,y:335},
-      {id:'f1_desk',n:'안내데스크',x:374,y:334},
-      {id:'f1_reg',n:'접수 테이블',x:500,y:363},
+      {id:'f1_desk',n:'건물 안내데스크 (행사 미사용)',x:374,y:334},
+      {id:'f1_reg',n:'접수테이블',x:500,y:363},
       {id:'f1_flap',n:'보안게이트 (에스컬레이터 · 당일 개방)',x:477,y:362},
       {id:'f1_sec',n:'게이트 (접견실·VIP룸)',x:548,y:424},
       {id:'f1_esc',n:'에스컬레이터 ↓↑ (2단 · 중간 환승)',x:481,y:372,go:'b1'},
@@ -346,6 +346,9 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 let state=clone(SEED);
 try{ const s=localStorage.getItem(KEY); if(s){ const d=JSON.parse(s); if(d&&d.places&&d.routes) state=Object.assign(clone(SEED),d); } }catch(e){}
 for(const L of LAYERS){ state.routes[L.id]=state.routes[L.id]||{}; for(const v in VIEWS) state.routes[L.id][v]=state.routes[L.id][v]||[]; }
+// 이름이 바뀐 기본 장소는 저장된 화면에도 반영 (사용자가 직접 바꾼 이름은 그대로)
+const RENAMED={f1_reg:[['접수 테이블'],'접수테이블'], f1_desk:[['안내데스크'],'건물 안내데스크 (행사 미사용)']};
+for(const v in state.places) (state.places[v]||[]).forEach(p=>{ const r=RENAMED[p.id]; if(r&&r[0].includes(p.n)) p.n=r[1]; });
 let shown=new Set(state.shown||[]);
 const save=()=>{ state.shown=[...shown]; try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} $('io').value=JSON.stringify({places:state.places,routes:state.routes,seat:state.seat,tables:state.tables}); };
 
