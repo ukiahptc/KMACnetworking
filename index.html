@@ -247,12 +247,18 @@ const F1_ESC=[[472,376],[490,372],[506,428],[488,434]];
 // 건물 안내데스크(행사 미사용): 로비 남서쪽 사선 유리벽(345,388)-(412,340)에 붙여 벽과 나란히, 에스컬레이터 쪽 끝으로
 const F1_DESK=[380,345], F1_DESK_DEG=-35.6;
 const F1_REG=[[497,361],[505,375]]; // 접수테이블 2개 (11시→5시 대각선), 사람은 테이블 서쪽(앞)으로 지나감
+// 접수테이블 뒤(동쪽) 사무국 운영 공간: 테이블 줄 양 끝을 조금 늘리고 뒤로 2.4m — 참석자 동선은 이 안으로 들어가지 않음
+const F1_REG_U=(([a,b])=>{ const dx=b[0]-a[0], dy=b[1]-a[1], l=Math.hypot(dx,dy); return [dx/l,dy/l]; })(F1_REG), F1_REG_N=[F1_REG_U[1],-F1_REG_U[0]];
+const F1_REG_ZONE=(()=>{ const [a,b]=F1_REG, u=F1_REG_U, n=F1_REG_N, p0=[a[0]-u[0]*9,a[1]-u[1]*9], p1=[b[0]+u[0]*9,b[1]+u[1]*9];
+  return [p0,p1,[p1[0]+n[0]*24,p1[1]+n[1]*24],[p0[0]+n[0]*24,p0[1]+n[1]*24]]; })();
+// 테이블 북쪽 끝과 브랜드존 사이 틈(약 0.8m)도 막음 → 측면 정문 쪽에서 와도 테이블 앞(서쪽)으로 돌아서 지나감
+const F1_REG_GAP=(()=>{ const p0=F1_REG_ZONE[0], q=F1_REG_ZONE[3]; return [p0,q,[q[0],333],[p0[0]+7,333]]; })();
 function rpoly(cx,cy,w,d,deg){ const a=deg*Math.PI/180, u=[Math.cos(a),Math.sin(a)], n=[-u[1],u[0]];
   return [[1,1],[1,-1],[-1,-1],[-1,1]].map(([i,j])=>[cx+u[0]*w/2*i+n[0]*d/2*j, cy+u[1]*w/2*i+n[1]*d/2*j]); }
 const F1_CORES=[R(551,322,75,25),R(543,363,83,25),R(543,388,10,22),R(678,440,40,38)];
 const GEO_F1={
   walk:[F1_FLOOR,R(418,258,42,26),R(698,294,20,22)],
-  blocks:[...F1_CORES,...F1_REG.map(([x,y])=>rpoly(x,y,15,6,60)),R(543,322,83,66),R(626,322,24,70),rpoly(...F1_DESK,38,20,F1_DESK_DEG),R(502,305,58,28),F1_ESC,{c:[518,398,8]}], // 엘리베이터 홀 통과 불가
+  blocks:[...F1_CORES,...F1_REG.map(([x,y])=>rpoly(x,y,15,6,60)),F1_REG_ZONE,F1_REG_GAP,R(543,322,83,66),R(626,322,24,70),rpoly(...F1_DESK,38,20,F1_DESK_DEG),R(502,305,58,28),F1_ESC,{c:[518,398,8]}], // 엘리베이터 홀 통과 불가
   walls:[...F1_OUT,...F1_VEST,...F1_VEST_E,...F1_ROOMWALLS,[548,437,548,478],[650,322,663,322]],
 };
 /* ───── 지하 1층 ───── */
@@ -585,6 +591,7 @@ function buildF1(){
   // 접수·보안
   flapGates(v,g,476,368,20,-14,4);
   F1_REG.forEach(([x,y])=>rbox(v,g,x,y,14,5,60,.75,M.white));
+  area(v,g,'접수 운영석',(F1_REG[0][0]+F1_REG[1][0])/2+F1_REG_N[0]*9,(F1_REG[0][1]+F1_REG[1][1])/2+F1_REG_N[1]*9,.2,true);
   // 게이트: 로봇 조형물 오른쪽 벽 아래, 동서로 통과 (남쪽은 유리 칸막이)
   flapGates(v,g,548,424,22,90,5); glass(v,g,[548,437,548,478],1.2);
   // 코어와 미팅룸 사이: 룸 (통과 불가)
@@ -847,6 +854,10 @@ function stepCrowd(dt){ for(const c of crowd){ if(c.done) continue; c.wait-=dt; 
   c.d=Math.min(c.stop,c.d+c.v*dt); const u=c.d/c.len, p=c.curve.getPointAt(u), tg=c.curve.getTangentAt(u), nl=Math.hypot(tg.x,tg.z)||1;
   c.g.position.set(p.x+tg.z/nl*c.off,p.y-.16,p.z-tg.x/nl*c.off); c.g.rotation.y=Math.atan2(tg.x,tg.z);
   c.ph+=dt*Math.min(c.v,3)*4.5; pose(c.g,c.ph,.55); if(c.d>=c.stop){ c.done=true; pose(c.g,0,0); } } }
+/* 접수 사무국: 접수테이블 뒤에 한 줄로 서서 참석자 쪽(서쪽)을 봄 */
+function regStaff(n){ const [a,b]=F1_REG, u=F1_REG_U, nn=F1_REG_N, L=Math.hypot(b[0]-a[0],b[1]-a[1])+14;
+  for(let k=0;k<n;k++){ const t=(k+.5)/n*L-L/2, cx=(a[0]+b[0])/2+u[0]*t+nn[0]*7, cy=(a[1]+b[1])/2+u[1]*t+nn[1]*7, [x,z]=W('f1',cx,cy), g=person('#0f766e');
+    g.position.set(x,hAt('f1',cx,cy),z); g.rotation.y=Math.atan2(-nn[0],-nn[1]); dyn.add(g); } }
 /* 한 자리에 서 있는 사람들: 가운데를 보고 둥글게 */
 function standRing(a,y,b,colors){ const m=colors.length, r=Math.max(.75,m*.62/(Math.PI*2));
   colors.forEach((col,k)=>{ const ang=.4+k/m*Math.PI*2, dx=r*Math.cos(ang), dz=r*Math.sin(ang), g=person(col);
@@ -946,7 +957,8 @@ function drawSlot(){ const S=TL.slots[tl]; if(!S) return; const it=slotItems(S,v
     const obj=new CSS2DObject(el); obj.position.set(a,y+2.2,b); dyn.add(obj);
     const cols=[];
     items.filter(o=>o.k==='stay'&&!arrive.has(o.l+'|'+pid)).forEach(o=>{ const L=LAYERS.find(x=>x.id===o.l); for(let k=0;k<(STAY_N[o.l]||2);k++) cols.push(L?L.color:'#64748b'); });
-    const n=Math.min(5,items.filter(o=>o.k==='staff').reduce((t,o)=>t+(o.n||1),0)); for(let k=0;k<n;k++) cols.push('#0f766e');
+    const n=Math.min(5,items.filter(o=>o.k==='staff').reduce((t,o)=>t+(o.n||1),0));
+    if(view==='f1'&&pid==='f1_reg') regStaff(n); else for(let k=0;k<n;k++) cols.push('#0f766e');
     if(cols.length) standRing(a,y,b,cols.slice(0,12)); });
 }
 function bestView(S){ let best=view, bn=slotCount(S,view); if(bn) return view; Object.keys(VIEWS).forEach(v=>{ const n=slotCount(S,v); if(n>bn){ bn=n; best=v; } }); return best; }
