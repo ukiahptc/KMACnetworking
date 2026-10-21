@@ -822,11 +822,39 @@ const dyn=new THREE.Group();
 const layerTex={};
 LAYERS.forEach(L=>{ layerTex[L.id]=canvasTex(128,32,(x,w,h)=>{ x.fillStyle=L.color; x.fillRect(0,0,w,h);
   x.strokeStyle='rgba(255,255,255,.95)'; x.lineWidth=7; x.lineCap='round'; x.lineJoin='round'; x.beginPath(); x.moveTo(48,7); x.lineTo(76,16); x.lineTo(48,25); x.stroke(); },true); });
-let routeAnims=[], hitMeshes=[], markerById={};
+let routeAnims=[], hitMeshes=[], markerById={}, crowd=[];
+/* 사람 모형: 다리·팔이 흔들리며 걷는 키 1.7m 인형. 셔츠 색 = 동선 레이어 색 */
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const P_GEO={leg:new THREE.BoxGeometry(.13,.8,.15).translate(0,-.4,0), arm:new THREE.BoxGeometry(.09,.58,.1).translate(0,-.29,0),
+  torso:new THREE.CylinderGeometry(.2,.16,.62,10), head:new THREE.SphereGeometry(.12,14,10)};
+const pantsMat=new THREE.MeshStandardMaterial({color:0x2b3038,roughness:.8}), skinMat=new THREE.MeshStandardMaterial({color:0xe2bf9c,roughness:.7}), shirtMat={};
+const pMat=c=>shirtMat[c]||(shirtMat[c]=new THREE.MeshStandardMaterial({color:c,roughness:.65}));
+function person(color){ const g=new THREE.Group(), shirt=pMat(color);
+  const legs=[-.08,.08].map(x=>{ const l=new THREE.Mesh(P_GEO.leg,pantsMat); l.position.set(x,.82,0); g.add(l); return l; });
+  const t=new THREE.Mesh(P_GEO.torso,shirt); t.position.y=1.13; g.add(t);
+  const arms=[-.26,.26].map(x=>{ const a=new THREE.Mesh(P_GEO.arm,shirt); a.position.set(x,1.42,0); g.add(a); return a; });
+  const h=new THREE.Mesh(P_GEO.head,skinMat); h.position.y=1.57; g.add(h);
+  g.traverse(o=>{ if(o.isMesh) o.castShadow=true; }); g.userData={legs,arms}; return g; }
+function pose(g,ph,amp){ const s=Math.sin(ph)*amp, u=g.userData; u.legs[0].rotation.x=s; u.legs[1].rotation.x=-s; u.arms[0].rotation.x=-s*.8; u.arms[1].rotation.x=s*.8; }
+/* 시간대 보기: 이동마다 몇 명씩 줄지어 걸어가 도착점에 멈춤 */
+const CROWD_N={vip:2,member:6,booth:3,ir:2,ops:2,vc:2}, STAY_N={vip:2,member:5,booth:2,ir:2,ops:2,vc:3};
+function spawnCrowd(list){ if(!list.length) return; const maxL=Math.max(...list.map(r=>r.len)), v=Math.min(6,Math.max(1.4,maxL/9));
+  list.forEach((r,ri)=>{ const n=CROWD_N[r.l]||2;
+    for(let k=0;k<n;k++){ const g=person(r.L.color); g.visible=false; dyn.add(g);
+      crowd.push({g,curve:r.curve,len:r.len,off:n>1?(k%2?.28:-.28):0,stop:Math.max(r.len*.05,r.len-Math.floor(k/2)*.65),d:0,
+        v:reduceMotion?1e6:v*(.92+Math.random()*.16),wait:reduceMotion?0:.8+ri*.25+Math.floor(k/2)*.45+(k%2)*.15,ph:Math.random()*6,done:false}); } }); }
+function stepCrowd(dt){ for(const c of crowd){ if(c.done) continue; c.wait-=dt; if(c.wait>0) continue; c.g.visible=true;
+  c.d=Math.min(c.stop,c.d+c.v*dt); const u=c.d/c.len, p=c.curve.getPointAt(u), tg=c.curve.getTangentAt(u), nl=Math.hypot(tg.x,tg.z)||1;
+  c.g.position.set(p.x+tg.z/nl*c.off,p.y-.16,p.z-tg.x/nl*c.off); c.g.rotation.y=Math.atan2(tg.x,tg.z);
+  c.ph+=dt*Math.min(c.v,3)*4.5; pose(c.g,c.ph,.55); if(c.d>=c.stop){ c.done=true; pose(c.g,0,0); } } }
+/* 한 자리에 서 있는 사람들: 가운데를 보고 둥글게 */
+function standRing(a,y,b,colors){ const m=colors.length, r=Math.max(.75,m*.62/(Math.PI*2));
+  colors.forEach((col,k)=>{ const ang=.4+k/m*Math.PI*2, dx=r*Math.cos(ang), dz=r*Math.sin(ang), g=person(col);
+    g.position.set(a+dx,y,b+dz); g.rotation.y=Math.atan2(-dx,-dz); dyn.add(g); }); }
 
 function clearDyn(){ dyn.traverse(o=>{ if(o.isCSS2DObject&&o.element.parentNode) o.element.remove(); if(o.geometry) o.geometry.dispose();
   if(o.material&&o.material.map&&o.material.userData.own) o.material.map.dispose(); });
-  while(dyn.children.length) dyn.remove(dyn.children[0]); routeAnims=[]; hitMeshes=[]; markerById={}; }
+  while(dyn.children.length) dyn.remove(dyn.children[0]); routeAnims=[]; hitMeshes=[]; markerById={}; crowd=[]; }
 
 function offsetLine(pts,d){ if(!d||pts.length<2) return pts; const n=pts.length, out=[];
   const nrm=(a,b)=>{ const dx=b[0]-a[0], dz=b[1]-a[1], l=Math.hypot(dx,dz)||1; return [-dz/l,dx/l]; };
@@ -844,7 +872,7 @@ function rounded(p,r){ const cp=new THREE.CurvePath(); if(p.length===2){ cp.add(
     if(rr>1e-4) cp.add(new THREE.QuadraticBezierCurve3(p1,c.clone(),p2)); prev=p2; }
   if(prev.distanceTo(p[p.length-1])>1e-4) cp.add(new THREE.LineCurve3(prev,p[p.length-1].clone())); return cp; }
 
-function routeMesh(v,L,li,planPts,editing){
+function routeMesh(v,L,li,planPts,editing,noWalker){
   let w=planPts.map(p=>W(v,p[0],p[1]));
   w=offsetLine(w,(li-2)*.15);
   if(v==='hall') w=subdiv(w,.6);
@@ -860,9 +888,9 @@ function routeMesh(v,L,li,planPts,editing){
   const en=new THREE.Mesh(new THREE.ConeGeometry(.26,.5,16),new THREE.MeshBasicMaterial({color:col}));
   const e=pts[pts.length-1], pe=curve.getPointAt(Math.max(0,1-.3/len)); en.position.copy(e);
   en.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),e.clone().sub(pe).normalize()); dyn.add(en);
-  const walker=new THREE.Mesh(new THREE.SphereGeometry(.2,16,12),new THREE.MeshBasicMaterial({color:0xffffff}));
-  const ring=new THREE.Mesh(new THREE.SphereGeometry(.28,16,12),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.45})); walker.add(ring); dyn.add(walker);
-  routeAnims.push({tex,curve,len,walker,t:Math.random()});
+  const walker=noWalker?null:person(L.color); if(walker) dyn.add(walker);
+  routeAnims.push({tex,curve,len,walker,t:Math.random(),ph:Math.random()*6});
+  return {curve,len,L};
 }
 function numBadge(v,L,xy,n){ const el=document.createElement('div'); el.className='num'; el.style.background=L.color; el.textContent=n;
   const o=new CSS2DObject(el); const [a,b]=W(v,xy[0],xy[1]); o.position.set(a,hAt(v,xy[0],xy[1])+.75,b); dyn.add(o); }
@@ -901,7 +929,11 @@ const staffGeo=new THREE.CapsuleGeometry(.12,.4,4,8), staffMat=new THREE.MeshSta
 function slotItems(S,v){ return {moves:S.moves.filter(m=>m.v===v), stays:S.stays.filter(x=>x.v===v), staff:S.staff.filter(x=>x.v===v)}; }
 function slotCount(S,v){ const it=slotItems(S,v); return it.moves.length+it.stays.length+it.staff.length; }
 function drawSlot(){ const S=TL.slots[tl]; if(!S) return; const it=slotItems(S,view);
-  it.moves.forEach(m=>{ const L=LAYERS.find(x=>x.id===m.l); if(!L) return; const pts=pathPts(view,{m:'auto',s:m.s}); if(pts.length>=2) routeMesh(view,L,LAYERS.indexOf(L),pts,false); });
+  const walks=[];
+  it.moves.forEach(m=>{ const L=LAYERS.find(x=>x.id===m.l); if(!L) return; const pts=pathPts(view,{m:'auto',s:m.s});
+    if(pts.length>=2){ const r=routeMesh(view,L,LAYERS.indexOf(L),pts,false,true); if(r) walks.push(Object.assign(r,{l:m.l})); } });
+  spawnCrowd(walks);
+  const arrive=new Set(it.moves.map(m=>m.l+'|'+String(m.s[m.s.length-1]))); // 이번에 걸어 들어오는 무리는 서 있는 사람으로 또 세우지 않음
   const by={}; const add=(pid,o)=>(by[pid]=by[pid]||[]).push(o);
   it.stays.forEach(x=>add(x.p,Object.assign({k:'stay'},x))); it.staff.forEach(x=>add(x.p,Object.assign({k:'staff'},x)));
   Object.entries(by).forEach(([pid,items])=>{ const p=pid.includes(',')?(([x,y])=>({x:+x,y:+y}))(pid.split(',')):placeById(view,pid); if(!p) return;
@@ -912,22 +944,33 @@ function drawSlot(){ const S=TL.slots[tl]; if(!S) return; const it=slotItems(S,v
       else { const bb=document.createElement('b'); bb.textContent='사무국'+(o.n?' '+o.n:''); r.append(bb,document.createTextNode(o.r)); }
       el.append(r); });
     const obj=new CSS2DObject(el); obj.position.set(a,y+2.2,b); dyn.add(obj);
-    const n=Math.min(5,items.filter(o=>o.k==='staff').reduce((t,o)=>t+(o.n||1),0));
-    for(let k=0;k<n;k++){ const m=new THREE.Mesh(staffGeo,staffMat), ang=.5+k/n*Math.PI*2; m.position.set(a+.55*Math.cos(ang),y+.33,b+.55*Math.sin(ang)); m.castShadow=true; dyn.add(m); } });
+    const cols=[];
+    items.filter(o=>o.k==='stay'&&!arrive.has(o.l+'|'+pid)).forEach(o=>{ const L=LAYERS.find(x=>x.id===o.l); for(let k=0;k<(STAY_N[o.l]||2);k++) cols.push(L?L.color:'#64748b'); });
+    const n=Math.min(5,items.filter(o=>o.k==='staff').reduce((t,o)=>t+(o.n||1),0)); for(let k=0;k<n;k++) cols.push('#0f766e');
+    if(cols.length) standRing(a,y,b,cols.slice(0,12)); });
 }
 function bestView(S){ let best=view, bn=slotCount(S,view); if(bn) return view; Object.keys(VIEWS).forEach(v=>{ const n=slotCount(S,v); if(n>bn){ bn=n; best=v; } }); return best; }
 function setSlot(i){ tl=(i===null||i<0||i>=TL.slots.length)?null:i;
   if(tl!==null){ if(cur!==null) finish(); if(tool!=='view'&&tool!=='table') tool='view'; selPlace=null;
     const v=bestView(TL.slots[tl]); if(v!==view){ setView(v); return; } }
   rebuild(); const btn=$('tlbar').querySelector('[aria-pressed="true"]'); btn?.scrollIntoView({block:'nearest',inline:'nearest'}); }
-function stopPlay(){ if(playing){ clearInterval(playing); playing=null; } }
+let demo=null; // 시연: {i 시간대, fl 보여 줄 층들, fi 지금 층, wait 다음으로 넘어갈 시각}
+function stopPlay(){ playing=null; demo=null; }
+const slotFloors=S=>Object.keys(VIEWS).filter(v=>slotCount(S,v));
+function demoShow(i,fi){ const fl=slotFloors(TL.slots[i]); if(!fl.length) return demoNextFrom(i);
+  demo={i,fl,fi,wait:0}; tl=i; if(cur!==null) finish(); if(tool!=='view'&&tool!=='table') tool='view'; selPlace=null;
+  if(fl[fi]!==view) setView(fl[fi]); else rebuild();
+  $('tlbar').querySelector('[aria-pressed="true"]')?.scrollIntoView({block:'nearest',inline:'nearest'}); }
+function demoNextFrom(i){ if(i+1<TL.slots.length) demoShow(i+1,0); else { stopPlay(); uiTimeline(); say('시연이 끝났습니다.'); } }
+function demoNext(){ const d=demo; if(d.fi+1<d.fl.length) demoShow(d.i,d.fi+1); else demoNextFrom(d.i); }
+function demoTick(now){ if(!playing||!demo) return; if(crowd.some(c=>!c.done)) return;
+  if(!demo.wait) demo.wait=now+(crowd.length?2200:3500); else if(now>demo.wait) demoNext(); }
 function togglePlay(){ if(playing){ stopPlay(); uiTimeline(); return; }
-  setSlot(tl===null||tl>=TL.slots.length-1?0:tl+1);
-  playing=setInterval(()=>{ if(tl>=TL.slots.length-1){ stopPlay(); uiTimeline(); return; } setSlot(tl+1); },4500); uiTimeline(); }
+  playing=true; demoShow(tl===null||tl>=TL.slots.length-1?0:tl,0); uiTimeline(); }
 function uiTimeline(){
   const bar=$('tlbar'); if(!TL.slots.length){ bar.hidden=true; $('tlcard').hidden=true; return; }
   bar.innerHTML=`<button class="all" data-i="-1" aria-pressed="${tl===null}">편집한 동선</button>`+TL.slots.map((S,i)=>`<button data-i="${i}" aria-pressed="${tl===i}" title="${escH(S.t+' '+S.title)}"><b>${escH(S.t)}</b><span>${escH(S.title)}</span></button>`).join('')+
-    `<button class="play" id="tlPlay" aria-pressed="${!!playing}">${playing?'■ 정지':'▶ 재생'}</button>`;
+    `<button class="play" id="tlPlay" aria-pressed="${!!playing}">${playing?'■ 시연 정지':'▶ 시연 재생'}</button>`;
   const card=$('tlcard'); if(tl===null){ card.hidden=true; return; }
   const S=TL.slots[tl]; card.hidden=false;
   const fl=Object.keys(VIEWS).map(v=>{ const n=slotCount(S,v); return n?`<button data-go="${v}" aria-pressed="${v===view}">${VIEWS[v].short} ${n}</button>`:''; }).join('');
@@ -936,7 +979,7 @@ function uiTimeline(){
     (S.staffTotal?`<div class="s"><b>사무국 배치 · ${escH(S.staffTotal)}</b><span>${escH(S.staffNote)}</span></div>`:''));
 }
 $('tlbar').onclick=e=>{ if(e.target.closest('#tlPlay')){ togglePlay(); return; } const b=e.target.closest('[data-i]'); if(!b) return; stopPlay(); setSlot(+b.dataset.i); };
-$('tlcard').onclick=e=>{ if(e.target.closest('#tlMin')){ cardMin=!cardMin; uiTimeline(); return; } const b=e.target.closest('[data-go]'); if(b&&b.dataset.go!==view) setView(b.dataset.go); };
+$('tlcard').onclick=e=>{ if(e.target.closest('#tlMin')){ cardMin=!cardMin; uiTimeline(); return; } const b=e.target.closest('[data-go]'); if(!b) return; if(b.dataset.go!==view) setView(b.dataset.go); else rebuild(); };
 
 /* ───────── 화면 전환·카메라 ───────── */
 let tween=null;
@@ -1048,12 +1091,12 @@ function ui(){
       (ls.length?ls.map(l=>{ const L=LAYERS.find(x=>x.id===l); return L?`<div class="it"><i style="background:${L.color}"></i>${L.name}</div>`:''; }).join(''):'<div class="none">이 층에는 이 시간대 움직임이 없습니다</div>')+
       (it.staff.length?`<div class="it"><i style="background:#0f766e;height:10px;width:10px;border-radius:50%"></i>사무국 배치</div>`:''); }
   uiTimeline();
-  $('hint').textContent=tl!==null?'시간대 보기 · 아래 막대에서 시간을 고르거나 ▶ 재생 · "편집한 동선"을 누르면 원래 화면':HINT[tool];
+  $('hint').textContent=tl!==null?(playing?'시연 중 · 층마다 사람들이 도착하면 다음 층·다음 시간대로 넘어갑니다 · ■ 시연 정지':'시간대 보기 · 아래 막대에서 시간을 고르거나 ▶ 시연 재생 · 층 버튼을 다시 누르면 걷기를 다시 봅니다'):HINT[tool];
   const p=selPlace&&placeById(view,selPlace); $('selBox').hidden=!(tool==='place'&&p);
   if(p){ if(document.activeElement!==$('selName')) $('selName').value=p.n; $('selGo').value=p.go||''; }
   renderer.domElement.style.cursor=tool==='view'?'grab':'crosshair';
 }
-$('tabs').onclick=e=>{ const b=e.target.closest('[data-v]'); if(b&&b.dataset.v!==view) setView(b.dataset.v); };
+$('tabs').onclick=e=>{ const b=e.target.closest('[data-v]'); if(!b) return; if(b.dataset.v!==view) setView(b.dataset.v); else if(tl!==null) rebuild(); }; // 시간대 보기에서 같은 층을 다시 누르면 걷기 다시
 $('chips').onclick=e=>{ const b=e.target.closest('[data-l]'); if(!b) return; const id=b.dataset.l; shown.has(id)?shown.delete(id):shown.add(id); save(); rebuild(); };
 $('allOn').onclick=()=>{ LAYERS.forEach(L=>shown.add(L.id)); save(); rebuild(); };
 $('allOff').onclick=()=>{ shown.clear(); save(); rebuild(); };
@@ -1119,8 +1162,11 @@ renderer.setAnimationLoop(now=>{
   if(tween){ const k=Math.min(1,(now-tween.s)/tween.ms), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
     camera.position.lerpVectors(tween.p0,tween.p1,e); controls.target.lerpVectors(tween.t0,tween.t1,e); if(k>=1) tween=null; }
   controls.update();
-  if(!reduce) routeAnims.forEach(a=>{ a.tex.offset.x-=dt*1.4/.9; a.t=(a.t+dt*2.2/a.len)%1; a.walker.position.copy(a.curve.getPointAt(a.t)); });
-  else routeAnims.forEach(a=>a.walker.visible=false);
+  if(!reduce) routeAnims.forEach(a=>{ a.tex.offset.x-=dt*1.4/.9; if(!a.walker) return; a.t=(a.t+dt*1.6/a.len)%1;
+    const q=a.curve.getPointAt(a.t), d=a.curve.getTangentAt(a.t); a.walker.position.set(q.x,q.y-.16,q.z); a.walker.rotation.y=Math.atan2(d.x,d.z);
+    a.ph+=dt*6.4; pose(a.walker,a.ph,.5); });
+  else routeAnims.forEach(a=>{ if(a.walker) a.walker.visible=false; });
+  stepCrowd(dt); demoTick(now);
   const sc=scenes[view];
   sc.cutaway.forEach(w=>{ const out=camera.position.clone().sub(w.c).dot(w.n)>0; const op=out?.1:1;
     if(w.m.material.opacity!==op){ w.m.material.opacity=op; w.m.material.depthWrite=!out; } });
