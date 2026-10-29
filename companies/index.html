@@ -4,89 +4,147 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>참가 기업 소개</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<meta name="theme-color" content="#0b1846">
+<title>네트워킹 데이 참여기업</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap">
 <style>
 :root{
-  --bg:#f3f4f0; --surface:#fff; --surface-2:#eceee8; --fg:#1d2327; --muted:#5f6870; --line:#d6d9d1;
-  --accent:#1f5c4d; --accent-fg:#fff; --accent-soft:#e1ece8; --mark:#fbe7a6;
-  --font:'IBM Plex Sans KR',system-ui,-apple-system,sans-serif;
-  color-scheme:light;
+  --navy-0:#070f33; --navy-1:#0b1846; --navy-2:#13286b; --navy-line:rgba(255,255,255,.14);
+  --blue:#1f56d6; --blue-hi:#3d86ff; --cyan:#7fd6ff;
+  --paper:#fff; --paper-2:#f2f6fd; --ink:#16213f; --ink-2:#55607a; --rule:#dfe5f0;
+  --amber:#f4b740;
+  --font:'Pretendard Variable',Pretendard,-apple-system,system-ui,sans-serif;
+  --display:'Audiowide',var(--font);
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#14181b; --surface:#1c2125; --surface-2:#252b30; --fg:#e7eae5; --muted:#9aa4ad; --line:#343b41;
-  --accent:#6fc0a7; --accent-fg:#0f1513; --accent-soft:#1f3530; --mark:#5c4a12; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#14181b; --surface:#1c2125; --surface-2:#252b30; --fg:#e7eae5; --muted:#9aa4ad; --line:#343b41;
-  --accent:#6fc0a7; --accent-fg:#0f1513; --accent-soft:#1f3530; --mark:#5c4a12; color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 var(--font);-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:anywhere}
+html{background:var(--navy-0)}
+body{margin:0;min-height:100vh;color:#fff;font:15px/1.6 var(--font);-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:anywhere;
+  background:radial-gradient(120% 60% at 50% 0%,var(--navy-2) 0%,var(--navy-1) 45%,var(--navy-0) 100%) fixed}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px}
-header{padding:28px 0 14px}
-h1{font-size:22px;line-height:1.3;margin:0;letter-spacing:-.4px}
-.sub{margin:4px 0 0;color:var(--muted);font-size:13px}
-.bar{position:sticky;top:0;z-index:2;background:var(--bg);padding:10px 0 12px;border-bottom:1px solid var(--line)}
-.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px}
-.search:focus-within{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:-1px}
-.search svg{flex:none;color:var(--muted)}
-.search input{flex:1;min-width:0;border:0;background:none;color:var(--fg);font:inherit;font-size:16px;padding:12px 0;outline:none}
-.search button{border:0;background:none;color:var(--muted);font:inherit;font-size:13px;padding:6px 2px;cursor:pointer}
-.meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;color:var(--muted)}
-.meta button{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:12px;border-radius:999px;padding:3px 10px;cursor:pointer}
-ul{list-style:none;margin:0;padding:12px 0 40px;display:grid;gap:10px}
-details{background:var(--surface);border:1px solid var(--line);border-radius:14px}
-details[open]{border-color:var(--accent)}
+
+/* 표지 */
+.hero{position:relative;text-align:center;padding:44px 0 34px;overflow:hidden}
+.hero::before{content:"";position:absolute;left:50%;top:58%;width:280px;height:280px;transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(127,214,255,.38) 0%,rgba(61,134,255,.16) 38%,transparent 70%);pointer-events:none}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background-image:radial-gradient(1.2px 1.2px at 12% 70%,#9fd8ff 50%,transparent 51%),radial-gradient(1px 1px at 22% 82%,#c9b8ff 50%,transparent 51%),
+  radial-gradient(1.4px 1.4px at 78% 66%,#9fd8ff 50%,transparent 51%),radial-gradient(1px 1px at 88% 80%,#c9b8ff 50%,transparent 51%),
+  radial-gradient(1px 1px at 68% 88%,#fff 50%,transparent 51%),radial-gradient(1.2px 1.2px at 32% 92%,#fff 50%,transparent 51%)}
+.hero>*{position:relative}
+.org{margin:0;font-size:15px;font-weight:600;color:rgba(255,255,255,.88)}
+h1{margin:2px 0 0;font-size:32px;font-weight:800;letter-spacing:-.6px;line-height:1.25}
+.dash{width:28px;height:1px;background:rgba(255,255,255,.7);margin:16px auto}
+.date{margin:0;font-size:15px;font-weight:600;letter-spacing:.5px}
+.mark{margin:22px 0 0;font:12px var(--display);letter-spacing:2.5px;color:rgba(255,255,255,.85)}
+
+/* 검색·필터 */
+.bar{position:sticky;top:0;z-index:5;padding:10px 0 12px;background:rgba(9,20,62,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--navy-line)}
+.search{display:flex;align-items:center;gap:8px;background:var(--paper);color:var(--ink);border-radius:12px;padding:0 12px}
+.search:focus-within{box-shadow:0 0 0 3px rgba(61,134,255,.55)}
+.search svg{flex:none;color:var(--ink-2)}
+.search input{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:inherit;font-size:16px;padding:11px 0;outline:none}
+.search input::placeholder{color:#8a93a8}
+.search button{border:0;background:none;color:var(--ink-2);font:inherit;font-size:13px;padding:6px 2px;cursor:pointer}
+.chips{display:flex;gap:6px;overflow-x:auto;margin:10px -16px 0;padding:0 16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--navy-line);background:rgba(255,255,255,.06);color:rgba(255,255,255,.9);font:inherit;font-size:13px;border-radius:999px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--blue-hi);border-color:var(--blue-hi);color:#fff;font-weight:600}
+.chip .n{opacity:.7;margin-left:4px;font-size:12px}
+.chip:focus-visible,.search button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.sep{flex:none;width:1px;background:var(--navy-line);margin:4px 2px}
+
+/* 참여기업 목록 */
+.panel{margin:18px 0 28px;background:var(--paper);color:var(--ink);border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.panel-head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(180deg,#3d86ff 0%,#1f56d6 100%);color:#fff}
+.panel-head h2{margin:0;font-size:16px;font-weight:700}
+.panel-head .cnt{font-size:13px;opacity:.9}
+.panel-head button{border:1px solid rgba(255,255,255,.5);background:none;color:#fff;font:inherit;font-size:12px;border-radius:999px;padding:3px 10px;cursor:pointer;margin-left:8px}
+.list{list-style:none;margin:0;padding:0}
+.list>li+li{border-top:1px solid var(--rule)}
 summary{list-style:none;cursor:pointer;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:2px 10px}
 summary::-webkit-details-marker{display:none}
-summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:14px}
-.name{font-size:17px;font-weight:700;letter-spacing:-.3px}
-.chev{grid-row:1/3;grid-column:2;align-self:center;color:var(--muted);transition:transform .15s}
+summary:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.name{font-size:17px;font-weight:700;color:var(--blue);letter-spacing:-.3px}
+.badge{display:inline-block;vertical-align:2px;margin-left:6px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;color:var(--blue);background:#e3ecff}
+.badge.demand{color:#8a5a00;background:#fff1cf}
+.chev{grid-row:1/3;grid-column:2;align-self:center;color:#9aa3b8;transition:transform .15s}
 details[open] .chev{transform:rotate(180deg)}
-.intro{grid-column:1;color:var(--muted);font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-details[open] .intro{display:none}
+.line2{grid-column:1;font-size:13px;color:var(--ink-2)}
+.tags{color:var(--ink)}
+.tags span+span{margin-left:8px}
 .body{padding:0 16px 16px;display:grid;gap:14px}
-.body p{margin:0}
-h3{margin:0 0 4px;font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.2px}
-.body ul{padding:0;gap:4px}
+h3{margin:0 0 4px;font-size:12px;font-weight:700;color:var(--blue);letter-spacing:.2px}
+.body ul{list-style:none;margin:0;padding:0;display:grid;gap:3px}
 .body li{position:relative;padding-left:14px}
-.body li::before{content:"";position:absolute;left:2px;top:.72em;width:5px;height:5px;border-radius:50%;background:var(--muted)}
-.needs{background:var(--accent-soft);border-radius:10px;padding:10px 12px}
-mark{background:var(--mark);color:inherit;border-radius:2px}
-.empty{text-align:center;color:var(--muted);padding:48px 0}
-footer{color:var(--muted);font-size:12px;text-align:center;padding:0 0 32px}
+.body li::before{content:"";position:absolute;left:2px;top:.72em;width:5px;height:5px;border-radius:50%;background:#9aa3b8}
+.needs{background:var(--paper-2);border-left:3px solid var(--blue-hi);border-radius:6px;padding:10px 12px}
+.tbd{margin:0;color:#8a93a8;font-size:14px}
+.dom{font-size:13px;color:var(--ink-2)}
+mark{background:#ffe58a;color:inherit;border-radius:2px}
+.empty{text-align:center;color:var(--ink-2);padding:48px 0}
+footer{text-align:center;padding:0 0 36px;font:11px var(--display);letter-spacing:2px;color:rgba(255,255,255,.55)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1 id="title"></h1>
-    <p class="sub" id="sub"></p>
-  </header>
-  <div class="bar">
+<header class="hero wrap">
+  <p class="org" id="org"></p>
+  <h1 id="title"></h1>
+  <div class="dash"></div>
+  <p class="date" id="date"></p>
+  <p class="mark">AGENTIC AI ALLIANCE</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
     <label class="search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="text" enterkeyhint="search" placeholder="기업명, 서비스, 니즈 검색" autocomplete="off" aria-label="검색">
+      <input id="q" type="text" enterkeyhint="search" placeholder="기업명, 기술, 니즈 검색" autocomplete="off" aria-label="검색">
       <button id="clear" type="button" hidden>지우기</button>
     </label>
-    <div class="meta"><span id="count"></span><button id="toggle" type="button">모두 펼치기</button></div>
+    <div class="chips" id="chips" role="group" aria-label="필터"></div>
   </div>
-  <ul id="list"></ul>
-  <footer>목록은 가나다순입니다</footer>
 </div>
+
+<main class="wrap">
+  <section class="panel">
+    <div class="panel-head"><h2>참여기업</h2><span><span class="cnt" id="count"></span><button id="toggle" type="button">모두 펼치기</button></span></div>
+    <ul class="list" id="list"></ul>
+  </section>
+</main>
+<footer>AGENTIC AI ALLIANCE</footer>
+
 <script src="data.js"></script>
 <script>
 const ev = window.EVENT || {};
-const data = (window.COMPANIES || []).slice().sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-document.getElementById('title').textContent = ev.title || '참가 기업';
-document.getElementById('sub').textContent = ev.sub || '';
-if (ev.title) document.title = ev.title;
+// 정렬은 (주)·㈜·주식회사 등을 빼고 가나다순
+const sortKey = n => n.replace(/\(주\)|㈜|주\)|주식회사|\(.*?\)/g, '').trim();
+const data = (window.COMPANIES || []).slice().sort((a, b) => sortKey(a.name).localeCompare(sortKey(b.name), 'ko'));
+document.getElementById('org').textContent = ev.org || '';
+document.getElementById('title').textContent = ev.title || '참여기업';
+document.getElementById('date').textContent = ev.date || '';
 
-const $q = document.getElementById('q'), $list = document.getElementById('list');
+const $q = document.getElementById('q'), $list = document.getElementById('list'), $chips = document.getElementById('chips');
 const $count = document.getElementById('count'), $clear = document.getElementById('clear'), $toggle = document.getElementById('toggle');
 
 const asList = v => Array.isArray(v) ? v : (v ? [v] : []);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const norm = s => String(s).toLowerCase().replace(/\s+/g, '');
+
+// 필터: 구분 + 도메인 (도메인은 기업 수 많은 순)
+const state = { type: '', domain: '' };
+const domains = Object.entries(data.reduce((m, c) => (m[c.domain] = (m[c.domain] || 0) + 1, m), {})).sort((a, b) => b[1] - a[1]);
+const types = ['회원사', '수요기업'].map(t => [t, data.filter(c => c.type === t).length]);
+const chip = (key, val, label, n) => `<button type="button" class="chip" data-k="${key}" data-v="${esc(val)}">${esc(label)}${n != null ? `<span class="n">${n}</span>` : ''}</button>`;
+$chips.innerHTML = chip('all', '', '전체', data.length) + types.map(([t, n]) => chip('type', t, t, n)).join('')
+  + '<span class="sep"></span>' + domains.map(([d, n]) => chip('domain', d, d, n)).join('');
+$chips.addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  if (b.dataset.k === 'all') { state.type = ''; state.domain = ''; }
+  else state[b.dataset.k] = state[b.dataset.k] === b.dataset.v ? '' : b.dataset.v;
+  render();
+});
 
 // 검색어를 공백 무시하고 찾아 <mark>로 감쌈
 function hl(text, q) {
@@ -101,23 +159,29 @@ function hl(text, q) {
   return out + esc(t.slice(last));
 }
 
-const section = (label, items, q, cls = '') => items.length ? `<div class="${cls}"><h3>${label}</h3>${
-  items.length === 1 ? `<p>${hl(items[0], q)}</p>` : `<ul>${items.map(x => `<li>${hl(x, q)}</li>`).join('')}</ul>`}</div>` : '';
+const section = (label, items, q, cls = '') => `<div class="${cls}"><h3>${label}</h3>${items.length
+  ? `<ul>${items.map(x => `<li>${hl(x, q)}</li>`).join('')}</ul>` : '<p class="tbd">내용 준비 중</p>'}</div>`;
 
 function render() {
   const q = norm($q.value.trim());
   $clear.hidden = !q;
-  const rows = data.filter(c => !q || norm([c.name, c.intro, ...asList(c.products), ...asList(c.needs)].join(' ')).includes(q));
-  $count.textContent = q ? `${rows.length}개 기업 검색됨 · 전체 ${data.length}개` : `참가 기업 ${data.length}개`;
-  $list.innerHTML = rows.length ? rows.map(c => `<li><details${q ? ' open' : ''}>
-    <summary><span class="name">${hl(c.name, q)}</span>
+  $chips.querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed',
+    b.dataset.k === 'all' ? String(!state.type && !state.domain) : String(state[b.dataset.k] === b.dataset.v)));
+  const rows = data.filter(c => (!state.type || c.type === state.type) && (!state.domain || c.domain === state.domain)
+    && (!q || norm([c.name, c.domain, ...asList(c.tags), ...asList(c.services), ...asList(c.needs)].join(' ')).includes(q)));
+  $count.textContent = rows.length === data.length ? `${data.length}개` : `${rows.length} / ${data.length}개`;
+  $list.innerHTML = rows.length ? rows.map(c => {
+    const tags = asList(c.tags);
+    return `<li><details${q ? ' open' : ''}>
+    <summary><span><span class="name">${hl(c.name, q)}</span><span class="badge${c.type === '수요기업' ? ' demand' : ''}">${esc(c.type)}</span></span>
       <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-      <span class="intro">${esc(c.intro || '')}</span></summary>
+      <span class="line2">${tags.length ? `<span class="tags">${tags.map(t => `<span>#${hl(t, q)}</span>`).join('')}</span>` : hl(c.domain, q)}</span></summary>
     <div class="body">
-      ${section('기업 소개', asList(c.intro), q)}
-      ${section('주요 서비스 · 제품', asList(c.products), q)}
-      ${section('니즈', asList(c.needs), q, 'needs')}
-    </div></details></li>`).join('') : '<li class="empty">검색 결과가 없습니다</li>';
+      ${section('주요 기술·서비스', asList(c.services), q)}
+      ${section('협업 니즈', asList(c.needs), q, 'needs')}
+      ${tags.length ? `<div class="dom">도메인 · ${hl(c.domain, q)}</div>` : ''}
+    </div></details></li>`;
+  }).join('') : '<li class="empty">조건에 맞는 기업이 없습니다</li>';
   syncToggle();
 }
 
