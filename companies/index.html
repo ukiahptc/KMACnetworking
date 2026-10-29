@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>참가 기업 소개</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f3f4f0; --surface:#fff; --surface-2:#eceee8; --fg:#1d2327; --muted:#5f6870; --line:#d6d9d1;
+  --accent:#1f5c4d; --accent-fg:#fff; --accent-soft:#e1ece8; --mark:#fbe7a6;
+  --font:'IBM Plex Sans KR',system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14181b; --surface:#1c2125; --surface-2:#252b30; --fg:#e7eae5; --muted:#9aa4ad; --line:#343b41;
+  --accent:#6fc0a7; --accent-fg:#0f1513; --accent-soft:#1f3530; --mark:#5c4a12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14181b; --surface:#1c2125; --surface-2:#252b30; --fg:#e7eae5; --muted:#9aa4ad; --line:#343b41;
+  --accent:#6fc0a7; --accent-fg:#0f1513; --accent-soft:#1f3530; --mark:#5c4a12; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 var(--font);-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:anywhere}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 14px}
+h1{font-size:22px;line-height:1.3;margin:0;letter-spacing:-.4px}
+.sub{margin:4px 0 0;color:var(--muted);font-size:13px}
+.bar{position:sticky;top:0;z-index:2;background:var(--bg);padding:10px 0 12px;border-bottom:1px solid var(--line)}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+.search:focus-within{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:-1px}
+.search svg{flex:none;color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;background:none;color:var(--fg);font:inherit;font-size:16px;padding:12px 0;outline:none}
+.search button{border:0;background:none;color:var(--muted);font:inherit;font-size:13px;padding:6px 2px;cursor:pointer}
+.meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;color:var(--muted)}
+.meta button{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:12px;border-radius:999px;padding:3px 10px;cursor:pointer}
+ul{list-style:none;margin:0;padding:12px 0 40px;display:grid;gap:10px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+details[open]{border-color:var(--accent)}
+summary{list-style:none;cursor:pointer;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+summary::-webkit-details-marker{display:none}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:14px}
+.name{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.chev{grid-row:1/3;grid-column:2;align-self:center;color:var(--muted);transition:transform .15s}
+details[open] .chev{transform:rotate(180deg)}
+.intro{grid-column:1;color:var(--muted);font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+details[open] .intro{display:none}
+.body{padding:0 16px 16px;display:grid;gap:14px}
+.body p{margin:0}
+h3{margin:0 0 4px;font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.2px}
+.body ul{padding:0;gap:4px}
+.body li{position:relative;padding-left:14px}
+.body li::before{content:"";position:absolute;left:2px;top:.72em;width:5px;height:5px;border-radius:50%;background:var(--muted)}
+.needs{background:var(--accent-soft);border-radius:10px;padding:10px 12px}
+mark{background:var(--mark);color:inherit;border-radius:2px}
+.empty{text-align:center;color:var(--muted);padding:48px 0}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:0 0 32px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+  <div class="bar">
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="text" enterkeyhint="search" placeholder="기업명, 서비스, 니즈 검색" autocomplete="off" aria-label="검색">
+      <button id="clear" type="button" hidden>지우기</button>
+    </label>
+    <div class="meta"><span id="count"></span><button id="toggle" type="button">모두 펼치기</button></div>
+  </div>
+  <ul id="list"></ul>
+  <footer>목록은 가나다순입니다</footer>
+</div>
+<script src="data.js"></script>
+<script>
+const ev = window.EVENT || {};
+const data = (window.COMPANIES || []).slice().sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+document.getElementById('title').textContent = ev.title || '참가 기업';
+document.getElementById('sub').textContent = ev.sub || '';
+if (ev.title) document.title = ev.title;
+
+const $q = document.getElementById('q'), $list = document.getElementById('list');
+const $count = document.getElementById('count'), $clear = document.getElementById('clear'), $toggle = document.getElementById('toggle');
+
+const asList = v => Array.isArray(v) ? v : (v ? [v] : []);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = s => String(s).toLowerCase().replace(/\s+/g, '');
+
+// 검색어를 공백 무시하고 찾아 <mark>로 감쌈
+function hl(text, q) {
+  const t = String(text);
+  if (!q) return esc(t);
+  const chars = [], map = [];
+  for (let i = 0; i < t.length; i++) if (!/\s/.test(t[i])) { chars.push(t[i].toLowerCase()); map.push(i); }
+  const hay = chars.join(''), hits = [];
+  for (let i = hay.indexOf(q); i !== -1; i = hay.indexOf(q, i + q.length)) hits.push([map[i], map[i + q.length - 1] + 1]);
+  let out = '', last = 0;
+  for (const [s, e] of hits) { out += esc(t.slice(last, s)) + '<mark>' + esc(t.slice(s, e)) + '</mark>'; last = e; }
+  return out + esc(t.slice(last));
+}
+
+const section = (label, items, q, cls = '') => items.length ? `<div class="${cls}"><h3>${label}</h3>${
+  items.length === 1 ? `<p>${hl(items[0], q)}</p>` : `<ul>${items.map(x => `<li>${hl(x, q)}</li>`).join('')}</ul>`}</div>` : '';
+
+function render() {
+  const q = norm($q.value.trim());
+  $clear.hidden = !q;
+  const rows = data.filter(c => !q || norm([c.name, c.intro, ...asList(c.products), ...asList(c.needs)].join(' ')).includes(q));
+  $count.textContent = q ? `${rows.length}개 기업 검색됨 · 전체 ${data.length}개` : `참가 기업 ${data.length}개`;
+  $list.innerHTML = rows.length ? rows.map(c => `<li><details${q ? ' open' : ''}>
+    <summary><span class="name">${hl(c.name, q)}</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      <span class="intro">${esc(c.intro || '')}</span></summary>
+    <div class="body">
+      ${section('기업 소개', asList(c.intro), q)}
+      ${section('주요 서비스 · 제품', asList(c.products), q)}
+      ${section('니즈', asList(c.needs), q, 'needs')}
+    </div></details></li>`).join('') : '<li class="empty">검색 결과가 없습니다</li>';
+  syncToggle();
+}
+
+function syncToggle() {
+  const all = [...$list.querySelectorAll('details')];
+  $toggle.hidden = !all.length;
+  $toggle.textContent = all.length && all.every(d => d.open) ? '모두 접기' : '모두 펼치기';
+}
+
+$q.addEventListener('input', render);
+$clear.addEventListener('click', () => { $q.value = ''; render(); $q.focus(); });
+$toggle.addEventListener('click', () => {
+  const all = [...$list.querySelectorAll('details')], open = !all.every(d => d.open);
+  all.forEach(d => d.open = open); syncToggle();
+});
+$list.addEventListener('toggle', syncToggle, true);
+render();
+</script>
+</body>
+</html>
