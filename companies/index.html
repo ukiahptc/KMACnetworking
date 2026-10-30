@@ -71,7 +71,8 @@ summary:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 .badge.demand{color:#8a5a00;background:#fff1cf}
 .chev{grid-row:1/3;grid-column:2;align-self:center;color:#9aa3b8;transition:transform .15s}
 details[open] .chev{transform:rotate(180deg)}
-.line2{grid-column:1;font-size:13px;color:var(--ink-2)}
+.line2{grid-column:1;font-size:13px;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+details[open] .line2{display:none}
 .tags{color:var(--ink)}
 .tags span+span{margin-left:8px}
 .body{padding:0 16px 16px;display:grid;gap:14px}
@@ -175,11 +176,11 @@ function render() {
     return `<li><details${q ? ' open' : ''}>
     <summary><span><span class="name">${hl(c.name, q)}</span><span class="badge${c.type === '수요기업' ? ' demand' : ''}">${esc(c.type)}</span></span>
       <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-      <span class="line2">${tags.length ? `<span class="tags">${tags.map(t => `<span>#${hl(t, q)}</span>`).join('')}</span>` : hl(c.domain, q)}</span></summary>
+      <span class="line2">${tags.length ? `<span class="tags">${tags.map(t => `<span>#${hl(t, q)}</span>`).join('')}</span>` : hl(asList(c.services)[0] || c.domain, q)}</span></summary>
     <div class="body">
       ${section('주요 기술·서비스', asList(c.services), q)}
       ${section('협업 니즈', asList(c.needs), q, 'needs')}
-      ${tags.length ? `<div class="dom">도메인 · ${hl(c.domain, q)}</div>` : ''}
+      <div class="dom">도메인 · ${hl(c.domain, q)}</div>
     </div></details></li>`;
   }).join('') : '<li class="empty">조건에 맞는 기업이 없습니다</li>';
   syncToggle();
