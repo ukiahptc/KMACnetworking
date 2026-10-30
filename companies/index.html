@@ -6,19 +6,21 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#070c2b">
 <title>네트워킹 데이 참여기업</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbit&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="preload" href="fonts/Paperlogy-4Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:'Paperlogy';src:url('fonts/Paperlogy-4Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Paperlogy';src:url('fonts/Paperlogy-5Medium.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Paperlogy';src:url('fonts/Paperlogy-6SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Paperlogy';src:url('fonts/Paperlogy-7Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Paperlogy';src:url('fonts/Paperlogy-8ExtraBold.woff2') format('woff2');font-weight:800;font-display:swap}
 :root{
   --night:#070c2b; --deep:#0c1645; --line:#1d2a6b; --ink:#eef1ff; --mute:#8f9bd0; --volt:#4c86ff; --glow:#7fe3ff;
-  --display:'Orbit','IBM Plex Sans KR',sans-serif;
-  --body:'IBM Plex Sans KR',-apple-system,system-ui,sans-serif;
+  --font:'Paperlogy',-apple-system,system-ui,sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{background:var(--night)}
-body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.65 var(--body);-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:anywhere;
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.65 var(--font);-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:anywhere;
   background:radial-gradient(90% 520px at 50% 0,#14236a 0%,var(--night) 100%) no-repeat,var(--night)}
 .wrap{max-width:680px;margin:0 auto;padding:0 18px}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
@@ -28,8 +30,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .cover{padding-top:40px;padding-bottom:8px}
 .logo{display:block;height:18px;width:auto;margin:0 0 24px}
 .eyebrow{margin:0;font-size:13px;font-weight:500;color:var(--mute)}
-h1{margin:4px 0 0;font:700 46px/1.1 var(--body);letter-spacing:-2px}
-.date{margin:10px 0 0;font:400 16px var(--display);color:var(--glow);letter-spacing:.5px;word-spacing:-.3em}
+h1{margin:4px 0 0;font:800 46px/1.1 var(--font);letter-spacing:-1.5px}
+.date{margin:10px 0 0;font:500 16px var(--font);color:var(--glow);letter-spacing:.3px}
 
 /* 분야별 블록 */
 .city{margin:30px 0 0}
@@ -37,7 +39,7 @@ h1{margin:4px 0 0;font:700 46px/1.1 var(--body);letter-spacing:-2px}
 .tower{cursor:pointer;transition:opacity .2s}
 .city.has-pick .tower{opacity:.22}
 .city.has-pick .tower.on{opacity:1}
-.tower text{font:400 11px var(--display);fill:var(--ink)}
+.tower text{font:600 11px var(--font);fill:var(--ink)}
 .cube{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
 @keyframes rise{from{transform:translateY(14px);opacity:0}}
 .caption{margin:10px 0 0;font-size:13px;color:var(--mute)}
@@ -46,7 +48,7 @@ h1{margin:4px 0 0;font:700 46px/1.1 var(--body);letter-spacing:-2px}
 .legend button[aria-pressed="true"]{color:var(--ink)}
 .legend button[aria-pressed="true"] .nm{text-decoration:underline;text-underline-offset:3px}
 .legend svg{flex:none;margin-top:1px}
-.legend .n{font-family:var(--display);color:var(--ink);margin-left:3px}
+.legend .n{font-weight:600;color:var(--ink);margin-left:3px}
 
 /* 검색 줄 */
 .bar{position:sticky;top:0;z-index:5;margin-top:26px;background:var(--night);border-bottom:1px solid var(--line)}
@@ -61,11 +63,11 @@ h1{margin:4px 0 0;font:700 46px/1.1 var(--body);letter-spacing:-2px}
 
 /* 디렉터리 */
 .group{margin:28px 0 0}
-.initial{display:flex;align-items:baseline;gap:10px;margin:0;padding-bottom:6px;border-bottom:1px solid var(--line);font:400 26px var(--display);color:var(--volt)}
-.initial small{font:12px var(--body);color:var(--mute)}
+.initial{display:flex;align-items:baseline;gap:10px;margin:0;padding-bottom:6px;border-bottom:1px solid var(--line);font:700 26px var(--font);color:var(--volt)}
+.initial small{font:12px var(--font);color:var(--mute)}
 .co{display:grid;grid-template-columns:22px minmax(0,1fr);gap:0 12px;padding:18px 0;border-bottom:1px solid var(--line)}
 .co>svg{margin-top:5px}
-.co h2{margin:0;font:400 20px/1.35 var(--display);letter-spacing:-.2px;word-spacing:-.25em}
+.co h2{margin:0;font:700 20px/1.35 var(--font);letter-spacing:-.3px}
 .meta{margin:2px 0 0;font-size:12.5px;color:var(--mute)}
 .meta .demand{color:#ffd37a}
 .lab{margin:12px 0 2px;font-size:11.5px;font-weight:600;letter-spacing:.4px;color:var(--mute)}
@@ -77,7 +79,7 @@ h1{margin:4px 0 0;font:700 46px/1.1 var(--body);letter-spacing:-2px}
 .need li{color:var(--ink)}
 mark{background:var(--glow);color:var(--night);border-radius:2px;padding:0 1px}
 .empty{padding:48px 0;text-align:center;color:var(--mute)}
-footer{padding:48px 0 40px;text-align:center;font:400 12px var(--display);letter-spacing:3px;color:var(--mute)}
+footer{padding:48px 0 40px;text-align:center;font:600 12px var(--font);letter-spacing:3px;color:var(--mute)}
 @media (prefers-reduced-motion:reduce){.cube{animation:none}.tower{transition:none}}
 @media (min-width:600px){h1{font-size:60px}.legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
