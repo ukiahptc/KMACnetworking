@@ -4,148 +4,169 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0b1846">
+<meta name="theme-color" content="#070c2b">
 <title>네트워킹 데이 참여기업</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbit&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
 <style>
 :root{
-  --navy-0:#070f33; --navy-1:#0b1846; --navy-2:#13286b; --navy-line:rgba(255,255,255,.14);
-  --blue:#1f56d6; --blue-hi:#3d86ff; --cyan:#7fd6ff;
-  --paper:#fff; --paper-2:#f2f6fd; --ink:#16213f; --ink-2:#55607a; --rule:#dfe5f0;
-  --amber:#f4b740;
-  --font:'Pretendard Variable',Pretendard,-apple-system,system-ui,sans-serif;
-  --display:'Audiowide',var(--font);
+  --night:#070c2b; --deep:#0c1645; --line:#1d2a6b; --ink:#eef1ff; --mute:#8f9bd0; --volt:#4c86ff; --glow:#7fe3ff;
+  --display:'Orbit','IBM Plex Sans KR',sans-serif;
+  --body:'IBM Plex Sans KR',-apple-system,system-ui,sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{background:var(--navy-0)}
-body{margin:0;min-height:100vh;color:#fff;font:15px/1.6 var(--font);-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:anywhere;
-  background:radial-gradient(120% 60% at 50% 0%,var(--navy-2) 0%,var(--navy-1) 45%,var(--navy-0) 100%) fixed}
-.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+html{background:var(--night)}
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.65 var(--body);-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:anywhere;
+  background:radial-gradient(90% 520px at 50% 0,#14236a 0%,var(--night) 100%) no-repeat,var(--night)}
+.wrap{max-width:680px;margin:0 auto;padding:0 18px}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--glow);outline-offset:3px}
 
 /* 표지 */
-.hero{position:relative;text-align:center;padding:44px 0 34px;overflow:hidden}
-.hero::before{content:"";position:absolute;left:50%;top:58%;width:280px;height:280px;transform:translate(-50%,-50%);
-  background:radial-gradient(circle,rgba(127,214,255,.38) 0%,rgba(61,134,255,.16) 38%,transparent 70%);pointer-events:none}
-.hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
-  background-image:radial-gradient(1.2px 1.2px at 12% 70%,#9fd8ff 50%,transparent 51%),radial-gradient(1px 1px at 22% 82%,#c9b8ff 50%,transparent 51%),
-  radial-gradient(1.4px 1.4px at 78% 66%,#9fd8ff 50%,transparent 51%),radial-gradient(1px 1px at 88% 80%,#c9b8ff 50%,transparent 51%),
-  radial-gradient(1px 1px at 68% 88%,#fff 50%,transparent 51%),radial-gradient(1.2px 1.2px at 32% 92%,#fff 50%,transparent 51%)}
-.hero>*{position:relative}
-.org{margin:0;font-size:15px;font-weight:600;color:rgba(255,255,255,.88)}
-h1{margin:2px 0 0;font-size:32px;font-weight:800;letter-spacing:-.6px;line-height:1.25}
-.dash{width:28px;height:1px;background:rgba(255,255,255,.7);margin:16px auto}
-.date{margin:0;font-size:15px;font-weight:600;letter-spacing:.5px}
-.mark{margin:22px 0 0;font:12px var(--display);letter-spacing:2.5px;color:rgba(255,255,255,.85)}
+.cover{padding-top:40px;padding-bottom:8px}
+.eyebrow{margin:0;font-size:13px;font-weight:500;color:var(--mute)}
+h1{margin:6px 0 0;font:400 40px/1.1 var(--display);letter-spacing:-.5px;word-spacing:-.3em}
+.date{margin:10px 0 0;font:400 16px var(--display);color:var(--glow);letter-spacing:.5px;word-spacing:-.3em}
 
-/* 검색·필터 */
-.bar{position:sticky;top:0;z-index:5;padding:10px 0 12px;background:rgba(9,20,62,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--navy-line)}
-.search{display:flex;align-items:center;gap:8px;background:var(--paper);color:var(--ink);border-radius:12px;padding:0 12px}
-.search:focus-within{box-shadow:0 0 0 3px rgba(61,134,255,.55)}
-.search svg{flex:none;color:var(--ink-2)}
-.search input{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:inherit;font-size:16px;padding:11px 0;outline:none}
-.search input::placeholder{color:#8a93a8}
-.search button{border:0;background:none;color:var(--ink-2);font:inherit;font-size:13px;padding:6px 2px;cursor:pointer}
-.chips{display:flex;gap:6px;overflow-x:auto;margin:10px -16px 0;padding:0 16px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;border:1px solid var(--navy-line);background:rgba(255,255,255,.06);color:rgba(255,255,255,.9);font:inherit;font-size:13px;border-radius:999px;padding:5px 12px;cursor:pointer;white-space:nowrap}
-.chip[aria-pressed="true"]{background:var(--blue-hi);border-color:var(--blue-hi);color:#fff;font-weight:600}
-.chip .n{opacity:.7;margin-left:4px;font-size:12px}
-.chip:focus-visible,.search button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-.sep{flex:none;width:1px;background:var(--navy-line);margin:4px 2px}
+/* 분야별 블록 */
+.city{margin:30px 0 0}
+#towers{display:block;width:100%;height:auto;overflow:visible}
+.tower{cursor:pointer;transition:opacity .2s}
+.city.has-pick .tower{opacity:.22}
+.city.has-pick .tower.on{opacity:1}
+.tower text{font:400 11px var(--display);fill:var(--ink)}
+.cube{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{transform:translateY(14px);opacity:0}}
+.caption{margin:10px 0 0;font-size:13px;color:var(--mute)}
+.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 10px;margin:14px 0 0;padding:0;list-style:none}
+.legend button{display:flex;align-items:flex-start;gap:7px;width:100%;text-align:left;padding:6px 0;font-size:12.5px;line-height:1.35;color:var(--mute)}
+.legend button[aria-pressed="true"]{color:var(--ink)}
+.legend button[aria-pressed="true"] .nm{text-decoration:underline;text-underline-offset:3px}
+.legend svg{flex:none;margin-top:1px}
+.legend .n{font-family:var(--display);color:var(--ink);margin-left:3px}
 
-/* 참여기업 목록 */
-.panel{margin:18px 0 28px;background:var(--paper);color:var(--ink);border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.35)}
-.panel-head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(180deg,#3d86ff 0%,#1f56d6 100%);color:#fff}
-.panel-head h2{margin:0;font-size:16px;font-weight:700}
-.panel-head .cnt{font-size:13px;opacity:.9}
-.panel-head button{border:1px solid rgba(255,255,255,.5);background:none;color:#fff;font:inherit;font-size:12px;border-radius:999px;padding:3px 10px;cursor:pointer;margin-left:8px}
-.list{list-style:none;margin:0;padding:0}
-.list>li+li{border-top:1px solid var(--rule)}
-summary{list-style:none;cursor:pointer;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:2px 10px}
-summary::-webkit-details-marker{display:none}
-summary:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
-.name{font-size:17px;font-weight:700;color:var(--blue);letter-spacing:-.3px}
-.badge{display:inline-block;vertical-align:2px;margin-left:6px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;color:var(--blue);background:#e3ecff}
-.badge.demand{color:#8a5a00;background:#fff1cf}
-.chev{grid-row:1/3;grid-column:2;align-self:center;color:#9aa3b8;transition:transform .15s}
-details[open] .chev{transform:rotate(180deg)}
-.line2{grid-column:1;font-size:13px;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-details[open] .line2{display:none}
-.tags{color:var(--ink)}
-.tags span+span{margin-left:8px}
-.body{padding:0 16px 16px;display:grid;gap:14px}
-h3{margin:0 0 4px;font-size:12px;font-weight:700;color:var(--blue);letter-spacing:.2px}
-.body ul{list-style:none;margin:0;padding:0;display:grid;gap:3px}
-.body li{position:relative;padding-left:14px}
-.body li::before{content:"";position:absolute;left:2px;top:.72em;width:5px;height:5px;border-radius:50%;background:#9aa3b8}
-.needs{background:var(--paper-2);border-left:3px solid var(--blue-hi);border-radius:6px;padding:10px 12px}
-.tbd{margin:0;color:#8a93a8;font-size:14px}
-.dom{font-size:13px;color:var(--ink-2)}
-mark{background:#ffe58a;color:inherit;border-radius:2px}
-.empty{text-align:center;color:var(--ink-2);padding:48px 0}
-footer{text-align:center;padding:0 0 36px;font:11px var(--display);letter-spacing:2px;color:rgba(255,255,255,.55)}
+/* 검색 줄 */
+.bar{position:sticky;top:0;z-index:5;margin-top:26px;background:var(--night);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:12px;height:54px}
+.bar input{flex:1;min-width:0;border:0;border-bottom:1px solid transparent;background:none;color:var(--ink);font:inherit;font-size:16px;padding:6px 0;outline:none}
+.bar input::placeholder{color:var(--mute)}
+.bar input:focus{border-bottom-color:var(--volt)}
+.type{display:flex;gap:12px;font-size:13px;color:var(--mute);flex:none}
+.type button[aria-pressed="true"]{color:var(--ink);font-weight:600}
+.status{display:flex;justify-content:space-between;gap:12px;padding:12px 0 0;font-size:13px;color:var(--mute)}
+.status button{color:var(--glow)}
+
+/* 디렉터리 */
+.group{margin:28px 0 0}
+.initial{display:flex;align-items:baseline;gap:10px;margin:0;padding-bottom:6px;border-bottom:1px solid var(--line);font:400 26px var(--display);color:var(--volt)}
+.initial small{font:12px var(--body);color:var(--mute)}
+.co{display:grid;grid-template-columns:22px minmax(0,1fr);gap:0 12px;padding:18px 0;border-bottom:1px solid var(--line)}
+.co>svg{margin-top:5px}
+.co h2{margin:0;font:400 20px/1.35 var(--display);letter-spacing:-.2px;word-spacing:-.25em}
+.meta{margin:2px 0 0;font-size:12.5px;color:var(--mute)}
+.meta .demand{color:#ffd37a}
+.lab{margin:12px 0 2px;font-size:11.5px;font-weight:600;letter-spacing:.4px;color:var(--mute)}
+.co ul{margin:0;padding:0;list-style:none}
+.co li{position:relative;padding-left:12px}
+.co li::before{content:"";position:absolute;left:0;top:.8em;width:5px;height:1px;background:var(--mute)}
+.svc{color:#c9d1f5}
+.need{border-left:2px solid var(--c);padding:2px 0 2px 12px;margin-left:-14px;padding-left:12px}
+.need li{color:var(--ink)}
+mark{background:var(--glow);color:var(--night);border-radius:2px;padding:0 1px}
+.empty{padding:48px 0;text-align:center;color:var(--mute)}
+footer{padding:48px 0 40px;text-align:center;font:400 12px var(--display);letter-spacing:3px;color:var(--mute)}
+@media (prefers-reduced-motion:reduce){.cube{animation:none}.tower{transition:none}}
+@media (min-width:600px){h1{font-size:52px}.legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
 <body>
-<header class="hero wrap">
-  <p class="org" id="org"></p>
+<header class="wrap cover">
+  <p class="eyebrow" id="org"></p>
   <h1 id="title"></h1>
-  <div class="dash"></div>
   <p class="date" id="date"></p>
-  <p class="mark">AGENTIC AI ALLIANCE</p>
+  <section class="city" id="city" aria-label="분야별 참여기업 수">
+    <svg id="towers" role="presentation"></svg>
+    <p class="caption" id="caption"></p>
+    <ul class="legend" id="legend"></ul>
+  </section>
 </header>
 
 <div class="bar">
   <div class="wrap">
-    <label class="search">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="text" enterkeyhint="search" placeholder="기업명, 기술, 니즈 검색" autocomplete="off" aria-label="검색">
-      <button id="clear" type="button" hidden>지우기</button>
-    </label>
-    <div class="chips" id="chips" role="group" aria-label="필터"></div>
+    <input id="q" type="text" enterkeyhint="search" placeholder="기업명, 기술, 니즈 검색" autocomplete="off" aria-label="기업명, 기술, 니즈 검색">
+    <div class="type" id="type" role="group" aria-label="구분"></div>
   </div>
 </div>
 
 <main class="wrap">
-  <section class="panel">
-    <div class="panel-head"><h2>참여기업</h2><span><span class="cnt" id="count"></span><button id="toggle" type="button">모두 펼치기</button></span></div>
-    <ul class="list" id="list"></ul>
-  </section>
+  <div class="status" aria-live="polite"><span id="count"></span><button id="reset" type="button" hidden>조건 지우기</button></div>
+  <div id="list"></div>
 </main>
 <footer>AGENTIC AI ALLIANCE</footer>
 
 <script src="data.js"></script>
 <script>
 const ev = window.EVENT || {};
-// 정렬은 (주)·㈜·주식회사 등을 빼고 가나다순
-const sortKey = n => n.replace(/\(주\)|㈜|주\)|주식회사|\(.*?\)/g, '').trim();
-const data = (window.COMPANIES || []).slice().sort((a, b) => sortKey(a.name).localeCompare(sortKey(b.name), 'ko'));
 document.getElementById('org').textContent = ev.org || '';
 document.getElementById('title').textContent = ev.title || '참여기업';
 document.getElementById('date').textContent = ev.date || '';
 
-const $q = document.getElementById('q'), $list = document.getElementById('list'), $chips = document.getElementById('chips');
-const $count = document.getElementById('count'), $clear = document.getElementById('clear'), $toggle = document.getElementById('toggle');
+// 분야별 색 — 리플렛 블록의 청·남·보라 계열에서
+const COLOR = {
+  '통신·IT서비스·인프라':'#4c86ff', '제조·생산·산업안전':'#6fe0ff', '의료·헬스케어·바이오':'#5cebc0',
+  '공공·행정·국방':'#a58bff', '교육·HR·미디어·콘텐츠':'#f28be0', '물류·유통·커머스·농식품':'#ffc46b',
+  '금융·보험·법무·규제':'#ff8f7a', '사이버보안':'#dfe6ff', '전산업':'#9aa6cc'
+};
+const colorOf = d => COLOR[d] || '#9aa6cc';
+const shade = (hex, k) => '#' + [1, 3, 5].map(i => Math.round(parseInt(hex.slice(i, i + 2), 16) * k).toString(16).padStart(2, '0')).join('');
 
-const asList = v => Array.isArray(v) ? v : (v ? [v] : []);
+// 가나다 정렬: (주)·㈜·주식회사 등은 빼고 비교
+const sortKey = n => n.replace(/\(주\)|㈜|주\)|주식회사|\(.*?\)/g, '').trim();
+const data = (window.COMPANIES || []).slice().sort((a, b) => sortKey(a.name).localeCompare(sortKey(b.name), 'ko'));
+const INITIALS = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const BASE = { 'ㄲ':'ㄱ', 'ㄸ':'ㄷ', 'ㅃ':'ㅂ', 'ㅆ':'ㅅ', 'ㅉ':'ㅈ' };
+function initial(name) {
+  const ch = sortKey(name).charCodeAt(0);
+  if (ch >= 0xAC00 && ch <= 0xD7A3) { const c = INITIALS[Math.floor((ch - 0xAC00) / 588)]; return BASE[c] || c; }
+  return 'A–Z';
+}
+
+// 아이소메트릭 큐브 하나 (윗면 중심 cx, cy)
+const R = 13, Q = 6.5, V = 12;
+function cube(cx, cy, col, delay) {
+  const top = `${cx},${cy - Q} ${cx + R},${cy} ${cx},${cy + Q} ${cx - R},${cy}`;
+  const left = `${cx - R},${cy} ${cx},${cy + Q} ${cx},${cy + Q + V} ${cx - R},${cy + V}`;
+  const right = `${cx},${cy + Q} ${cx + R},${cy} ${cx + R},${cy + V} ${cx},${cy + Q + V}`;
+  return `<g class="cube" style="animation-delay:${delay}ms"><polygon points="${left}" fill="${shade(col, .55)}"/><polygon points="${right}" fill="${shade(col, .35)}"/><polygon points="${top}" fill="${col}"/></g>`;
+}
+const swatch = col => `<svg width="16" height="18" viewBox="-13 -7 26 26" aria-hidden="true">${cube(0, 0, col, 0).replace('class="cube"', '')}</svg>`;
+
+// 분야별 기업 수만큼 쌓은 탑
+const domains = Object.entries(data.reduce((m, c) => (m[c.domain] = (m[c.domain] || 0) + 1, m), {})).sort((a, b) => b[1] - a[1]);
+const STEP = 36, maxN = Math.max(...domains.map(d => d[1]));
+const W = STEP * (domains.length - 1) + 2 * R, H = maxN * V + Q * 2 + V + 22;
+const baseY = H - V - Q;
+const $svg = document.getElementById('towers');
+$svg.setAttribute('viewBox', `${-R} 0 ${W} ${H}`);
+$svg.innerHTML = domains.map(([d, n], i) => {
+  const cx = i * STEP, col = colorOf(d);
+  let g = '';
+  for (let k = 0; k < n; k++) g += cube(cx, baseY - k * V, col, i * 60 + k * 35);
+  return `<g class="tower" data-d="${d}">${g}<text x="${cx}" y="${baseY - (n - 1) * V - Q - 6}" text-anchor="middle">${n}</text></g>`;
+}).join('');
+document.getElementById('caption').textContent = `참여기업 ${data.length}곳 · 블록 하나가 기업 하나입니다. 분야를 누르면 그 기업만 보입니다.`;
+document.getElementById('legend').innerHTML = domains.map(([d, n]) =>
+  `<li><button type="button" data-d="${d}" aria-pressed="false">${swatch(colorOf(d))}<span><span class="nm">${d}</span><span class="n">${n}</span></span></button></li>`).join('');
+
+const types = ['회원사', '수요기업'];
+document.getElementById('type').innerHTML = types.map(t => `<button type="button" data-t="${t}" aria-pressed="false">${t}</button>`).join('');
+
+const state = { domain: '', type: '' };
+const $q = document.getElementById('q'), $list = document.getElementById('list'), $count = document.getElementById('count'), $reset = document.getElementById('reset');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const norm = s => String(s).toLowerCase().replace(/\s+/g, '');
-
-// 필터: 구분 + 도메인 (도메인은 기업 수 많은 순)
-const state = { type: '', domain: '' };
-const domains = Object.entries(data.reduce((m, c) => (m[c.domain] = (m[c.domain] || 0) + 1, m), {})).sort((a, b) => b[1] - a[1]);
-const types = ['회원사', '수요기업'].map(t => [t, data.filter(c => c.type === t).length]);
-const chip = (key, val, label, n) => `<button type="button" class="chip" data-k="${key}" data-v="${esc(val)}">${esc(label)}${n != null ? `<span class="n">${n}</span>` : ''}</button>`;
-$chips.innerHTML = chip('all', '', '전체', data.length) + types.map(([t, n]) => chip('type', t, t, n)).join('')
-  + '<span class="sep"></span>' + domains.map(([d, n]) => chip('domain', d, d, n)).join('');
-$chips.addEventListener('click', e => {
-  const b = e.target.closest('.chip'); if (!b) return;
-  if (b.dataset.k === 'all') { state.type = ''; state.domain = ''; }
-  else state[b.dataset.k] = state[b.dataset.k] === b.dataset.v ? '' : b.dataset.v;
-  render();
-});
 
 // 검색어를 공백 무시하고 찾아 <mark>로 감쌈
 function hl(text, q) {
@@ -160,45 +181,43 @@ function hl(text, q) {
   return out + esc(t.slice(last));
 }
 
-const section = (label, items, q, cls = '') => `<div class="${cls}"><h3>${label}</h3>${items.length
-  ? `<ul>${items.map(x => `<li>${hl(x, q)}</li>`).join('')}</ul>` : '<p class="tbd">내용 준비 중</p>'}</div>`;
+function entry(c, q) {
+  const col = colorOf(c.domain);
+  return `<article class="co" style="--c:${col}">${swatch(col)}<div>
+    <h2>${hl(c.name, q)}</h2>
+    <p class="meta"><span class="${c.type === '수요기업' ? 'demand' : ''}">${esc(c.type)}</span> · ${hl(c.domain, q)}</p>
+    <p class="lab">기술·서비스</p><ul class="svc">${c.services.map(s => `<li>${hl(s, q)}</li>`).join('')}</ul>
+    <p class="lab">협업 니즈</p><div class="need"><ul>${c.needs.map(s => `<li>${hl(s, q)}</li>`).join('')}</ul></div>
+  </div></article>`;
+}
 
 function render() {
   const q = norm($q.value.trim());
-  $clear.hidden = !q;
-  $chips.querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed',
-    b.dataset.k === 'all' ? String(!state.type && !state.domain) : String(state[b.dataset.k] === b.dataset.v)));
-  const rows = data.filter(c => (!state.type || c.type === state.type) && (!state.domain || c.domain === state.domain)
-    && (!q || norm([c.name, c.domain, ...asList(c.tags), ...asList(c.services), ...asList(c.needs)].join(' ')).includes(q)));
-  $count.textContent = rows.length === data.length ? `${data.length}개` : `${rows.length} / ${data.length}개`;
-  $list.innerHTML = rows.length ? rows.map(c => {
-    const tags = asList(c.tags);
-    return `<li><details${q ? ' open' : ''}>
-    <summary><span><span class="name">${hl(c.name, q)}</span><span class="badge${c.type === '수요기업' ? ' demand' : ''}">${esc(c.type)}</span></span>
-      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-      <span class="line2">${tags.length ? `<span class="tags">${tags.map(t => `<span>#${hl(t, q)}</span>`).join('')}</span>` : hl(asList(c.services)[0] || c.domain, q)}</span></summary>
-    <div class="body">
-      ${section('주요 기술·서비스', asList(c.services), q)}
-      ${section('협업 니즈', asList(c.needs), q, 'needs')}
-      <div class="dom">도메인 · ${hl(c.domain, q)}</div>
-    </div></details></li>`;
-  }).join('') : '<li class="empty">조건에 맞는 기업이 없습니다</li>';
-  syncToggle();
+  const rows = data.filter(c => (!state.domain || c.domain === state.domain) && (!state.type || c.type === state.type)
+    && (!q || norm([c.name, c.domain, c.type, ...c.services, ...c.needs].join(' ')).includes(q)));
+  const groups = [];
+  rows.forEach(c => { const k = initial(c.name); (groups.at(-1)?.k === k ? groups.at(-1) : (groups.push({ k, items: [] }), groups.at(-1))).items.push(c); });
+  $list.innerHTML = rows.length ? groups.map(g => `<section class="group"><h3 class="initial">${g.k}<small>${g.items.length}곳</small></h3>${g.items.map(c => entry(c, q)).join('')}</section>`).join('')
+    : '<p class="empty">조건에 맞는 기업이 없습니다. 검색어나 분야를 바꿔 보세요.</p>';
+  const filtered = q || state.domain || state.type;
+  $count.textContent = filtered ? `${[state.domain, state.type].filter(Boolean).join(' · ') || '검색 결과'} ${rows.length}곳` : `전체 ${data.length}곳 · 가나다순`;
+  $reset.hidden = !filtered;
+  document.getElementById('city').classList.toggle('has-pick', !!state.domain);
+  document.querySelectorAll('.tower').forEach(t => t.classList.toggle('on', t.dataset.d === state.domain));
+  document.querySelectorAll('.legend button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.d === state.domain)));
+  document.querySelectorAll('.type button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === state.type)));
 }
 
-function syncToggle() {
-  const all = [...$list.querySelectorAll('details')];
-  $toggle.hidden = !all.length;
-  $toggle.textContent = all.length && all.every(d => d.open) ? '모두 접기' : '모두 펼치기';
+function pickDomain(d) {
+  state.domain = state.domain === d ? '' : d;
+  render();
+  if (state.domain) document.querySelector('.bar').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
 }
-
+$svg.addEventListener('click', e => { const t = e.target.closest('.tower'); if (t) pickDomain(t.dataset.d); });
+document.getElementById('legend').addEventListener('click', e => { const b = e.target.closest('button'); if (b) pickDomain(b.dataset.d); });
+document.getElementById('type').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { state.type = state.type === b.dataset.t ? '' : b.dataset.t; render(); } });
 $q.addEventListener('input', render);
-$clear.addEventListener('click', () => { $q.value = ''; render(); $q.focus(); });
-$toggle.addEventListener('click', () => {
-  const all = [...$list.querySelectorAll('details')], open = !all.every(d => d.open);
-  all.forEach(d => d.open = open); syncToggle();
-});
-$list.addEventListener('toggle', syncToggle, true);
+$reset.addEventListener('click', () => { state.domain = ''; state.type = ''; $q.value = ''; render(); });
 render();
 </script>
 </body>
