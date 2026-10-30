@@ -43,7 +43,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
 #legend .none{font-size:12px;color:#5f6870;margin-top:2px}
 #hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:3;pointer-events:none;background:rgba(29,35,39,.86);color:#fff;font-size:12.5px;padding:6px 12px;border-radius:999px;white-space:nowrap;max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis}
 /* 장소 이름 끄기: 장소·구역 이름만 숨김 (치수선·시간대 말풍선·순서 번호는 유지, 장소 핀은 그대로 눌림) */
-#stage.no-names .pl,#stage.no-names .area:not(.dim){display:none!important}
+#stage.no-names .pl,#stage.no-names .stl,#stage.no-names .area:not(.dim){display:none!important}
 #tlbar{position:absolute;left:12px;right:12px;bottom:10px;z-index:4;display:flex;gap:4px;overflow-x:auto;padding:5px;background:rgba(255,255,255,.94);border:1px solid #d6d9d1;border-radius:9px;scrollbar-width:thin}
 #tlbar button{flex:none;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;padding:5px 8px;font-size:11px;line-height:1.25;background:#fff;color:#1d2327;border:1px solid #d6d9d1;border-radius:6px;text-align:left}
 #tlbar button b{font:600 11px var(--mono)}
@@ -107,6 +107,14 @@ details summary{cursor:pointer;font-size:13px;font-weight:600}
 /* 3D 라벨 */
 .pl{pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;font:600 12px/1 var(--font);color:#1d2327;background:rgba(255,255,255,.95);border:1px solid #c9cdc5;border-radius:999px;padding:4px 9px 4px 6px;box-shadow:0 1px 3px rgba(0,0,0,.16);user-select:none;transform:translateY(-6px)}
 .pl i{width:8px;height:8px;border-radius:50%;background:#334155;flex:none}
+.stl{pointer-events:none;white-space:nowrap;font:700 11px/1 var(--font);color:#fff;background:#0f766e;border-radius:4px;padding:3px 6px;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.stl.on{background:#e8590c}
+.tle{list-style:none;margin:8px 0 0;padding:0;font-size:12px;max-height:240px;overflow:auto;border-top:1px solid var(--line)}
+.tle li{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--line)}
+.tle li i{width:9px;height:9px;border-radius:50%;flex:none}
+.tle li span{flex:1;min-width:0}
+.tle li button{flex:none;padding:2px 7px;font-size:11px}
+.tle .k{color:var(--muted);font-size:11px}
 .pl b{font-weight:700;color:#0f766e;font-size:11px}
 .pl.go{border-color:#0f766e}
 .pl.go i{background:#0f766e}
@@ -155,6 +163,24 @@ details summary{cursor:pointer;font-size:13px;font-weight:600}
     <div class="row"><button id="finish">선 완료</button><button id="undo">되돌리기</button><button id="clearLayer">이 층 동선 지우기</button></div>
     <p class="status" id="status"></p>
   </details>
+  <details class="sec" id="tlEditSec" open hidden><summary>이 시간대 편집</summary>
+    <p class="note" id="tleHead"></p>
+    <p class="note">· 이동 추가: 편집의 「장소 잇기」나 「직접 그리기」로 그리면 「그릴 동선」 무리의 이동으로 이 시간대에 들어갑니다.<br>· 사람 세우기: 「운영진 배치」로 바닥을 누르면 아래에서 고른 종류로 섭니다.</p>
+    <label class="f">바닥을 누르면 세울 것<select id="tleKind"><option value="staff">사무국 운영진</option><option value="stay">머무는 무리 (그릴 동선 무리)</option></select></label>
+    <label class="f">설명<input type="text" id="tleText" placeholder="예: 홀 입구 안내, VIP석 대기"></label>
+    <ul class="tle" id="tleList"></ul>
+    <div class="row"><button id="tleReset">이 시간대 원래대로 (시나리오 기준)</button></div>
+  </details>
+  <details class="sec" id="staffSec" open><summary>운영진 배치</summary>
+    <label class="f">새 운영진 역할<input type="text" id="sname" placeholder="예: 접수, VIP 영접, 홀 안내" value="운영진"></label>
+    <p class="note">편집의 「운영진 배치」를 고른 뒤 빈 바닥을 누르면 이 역할로 운영진이 서고, 끌어서 옮깁니다. 눌러서 고르면 역할 변경 · 방향 돌리기(R) · 삭제(Delete).</p>
+    <div class="sel" id="stSel" hidden>
+      <label class="f" style="margin-top:0">선택한 운영진 역할<input type="text" id="stName"></label>
+      <div class="row"><button id="stRot">방향 45° 돌리기</button><button id="stDel">이 운영진 지우기</button></div>
+    </div>
+    <p class="note" id="stCount"></p>
+    <div class="row"><button id="stClear">이 층 운영진 모두 지우기</button></div>
+  </details>
   <details class="sec" id="placeSec" open><summary>장소</summary>
     <label class="f">새 장소 이름<input type="text" id="pname" placeholder="예: 포토월"></label>
     <p class="note">장소 편집 도구에서 빈 바닥을 누르면 이 이름으로 생깁니다.</p>
@@ -180,7 +206,7 @@ details summary{cursor:pointer;font-size:13px;font-weight:600}
       <label class="f">의자 (선택한 테이블 · 새 테이블)<select id="tchairs"></select></label>
       <label class="f">각도 <span id="tAngV" style="font-family:var(--mono)">0°</span><input type="range" id="tAng" min="0" max="359" step="1" value="0"></label>
       <div class="row"><button id="tRotM">−15°</button><button id="tRotP">+15°</button><button id="tRot">90° 회전</button><button id="tDel">선택 삭제</button></div>
-      <div class="row"><button id="tDefault">기본 배치 (테이블 섬)</button><button id="tRound">기본 배치 (원탁 8인)</button><button id="tClear">테이블 모두 지우기</button></div>
+      <div class="row"><button id="tRound">확정 배치 (원탁 12개)</button><button id="tDefault">테이블 섬 배치 (직사각형)</button><button id="tClear">테이블 모두 지우기</button></div>
       <p class="note" id="tCount"></p>
     </div>
   </details>
@@ -246,19 +272,17 @@ const F1_GARDEN=[[400,395],[418,386],[448,388],[456,402],[458,440],[442,470],[42
 const F1_ESC=[[472,376],[490,372],[506,428],[488,434]];
 // 건물 안내데스크(행사 미사용): 로비 남서쪽 사선 유리벽(345,388)-(412,340)에 붙여 벽과 나란히, 에스컬레이터 쪽 끝으로
 const F1_DESK=[380,345], F1_DESK_DEG=-35.6;
-const F1_REG=[[497,361],[505,375]]; // 접수테이블 2개 (11시→5시 대각선), 사람은 테이블 서쪽(앞)으로 지나감
-// 접수테이블 뒤(동쪽) 사무국 운영 공간: 테이블 줄 양 끝을 조금 늘리고 뒤로 2.4m — 참석자 동선은 이 안으로 들어가지 않음
-const F1_REG_U=(([a,b])=>{ const dx=b[0]-a[0], dy=b[1]-a[1], l=Math.hypot(dx,dy); return [dx/l,dy/l]; })(F1_REG), F1_REG_N=[F1_REG_U[1],-F1_REG_U[0]];
+const F1_REG=[[497,361],[505,375]]; // 접수테이블 2개 (11시→5시 대각선). 앞 = 로비 쪽(동쪽), 뒤 = 에스컬레이터 쪽(서쪽)
+// 접수 운영석: 테이블과 에스컬레이터 사이(테이블 뒤)는 사무국만 — 참석자는 로비 쪽에서 접수하고 테이블 북쪽 끝을 돌아 게이트·에스컬레이터로
+const F1_REG_U=(([a,b])=>{ const dx=b[0]-a[0], dy=b[1]-a[1], l=Math.hypot(dx,dy); return [dx/l,dy/l]; })(F1_REG), F1_REG_N=[F1_REG_U[1],-F1_REG_U[0]]; // N = 앞(로비 쪽)
 const F1_REG_ZONE=(()=>{ const [a,b]=F1_REG, u=F1_REG_U, n=F1_REG_N, p0=[a[0]-u[0]*9,a[1]-u[1]*9], p1=[b[0]+u[0]*9,b[1]+u[1]*9];
-  return [p0,p1,[p1[0]+n[0]*24,p1[1]+n[1]*24],[p0[0]+n[0]*24,p0[1]+n[1]*24]]; })();
-// 테이블 북쪽 끝과 브랜드존 사이 틈(약 0.8m)도 막음 → 측면 정문 쪽에서 와도 테이블 앞(서쪽)으로 돌아서 지나감
-const F1_REG_GAP=(()=>{ const p0=F1_REG_ZONE[0], q=F1_REG_ZONE[3]; return [p0,q,[q[0],333],[p0[0]+7,333]]; })();
+  return [p0,p1,[494,386],[490,372],[p0[0]-n[0]*10,p0[1]-n[1]*10]]; })(); // 테이블 줄 ~ 에스컬레이터 동쪽 가장자리
 function rpoly(cx,cy,w,d,deg){ const a=deg*Math.PI/180, u=[Math.cos(a),Math.sin(a)], n=[-u[1],u[0]];
   return [[1,1],[1,-1],[-1,-1],[-1,1]].map(([i,j])=>[cx+u[0]*w/2*i+n[0]*d/2*j, cy+u[1]*w/2*i+n[1]*d/2*j]); }
 const F1_CORES=[R(551,322,75,25),R(543,363,83,25),R(543,388,10,22),R(678,440,40,38)];
 const GEO_F1={
   walk:[F1_FLOOR,R(418,258,42,26),R(698,294,20,22)],
-  blocks:[...F1_CORES,...F1_REG.map(([x,y])=>rpoly(x,y,15,6,60)),F1_REG_ZONE,F1_REG_GAP,R(543,322,83,66),R(626,322,24,70),rpoly(...F1_DESK,38,20,F1_DESK_DEG),R(502,305,58,28),F1_ESC,{c:[518,398,8]}], // 엘리베이터 홀 통과 불가
+  blocks:[...F1_CORES,...F1_REG.map(([x,y])=>rpoly(x,y,15,6,60)),F1_REG_ZONE,R(543,322,83,66),R(626,322,24,70),rpoly(...F1_DESK,38,20,F1_DESK_DEG),R(502,305,58,28),F1_ESC,{c:[518,398,8]}], // 엘리베이터 홀 통과 불가
   walls:[...F1_OUT,...F1_VEST,...F1_VEST_E,...F1_ROOMWALLS,[548,437,548,478],[650,322,663,322]],
 };
 /* ───── 지하 1층 ───── */
@@ -284,9 +308,9 @@ function dim(v,g,a,b,txt,ticks){ const [x1,z1]=W(v,...a),[x2,z2]=W(v,...b); cons
 const TBL={L:1.8,D:.6,CH:.55}; // 1800×600 테이블, 의자 중심까지 거리(m)
 const RND={R:.85,CH:1.1,SEAT:.46}; // 원탁 지름 1700, 의자 중심까지 1.1m, 의자 깊이 0.46m → 의자 포함 지름 2.62m
 const isRound=t=>t.k==='round';
-// 전시 테이블(고정): 벽에서 1.5m 띄워 벽과 나란히. 오른쪽 1~5(무대 쪽부터), 왼쪽 6~10
-const EXPO=[...[70,108,146,184,222].map((y,i)=>({id:'e'+(i+1),n:i+1,x:282.6,y,r:90,c:0})),
-            ...[70,108,146,184,222].map((y,i)=>({id:'e'+(i+6),n:i+6,x:17.4,y,r:90,c:0}))];
+// 전시 테이블(고정) 8개: 벽에서 1.5m 띄워 벽과 나란히. 오른쪽 1~4(무대 쪽부터), 왼쪽 5~8
+const EXPO=[...[70,108,146,184].map((y,i)=>({id:'e'+(i+1),n:i+1,x:282.6,y,r:90,c:0})),
+            ...[70,108,146,184].map((y,i)=>({id:'e'+(i+5),n:i+5,x:17.4,y,r:90,c:0}))];
 // 기본 배치: 강의식은 쓰지 않음. 1800×600 두 개를 긴 변끼리 맞붙여 무대와 수직(세로)으로 세운 '테이블 섬'.
 // 의자는 각 테이블의 바깥쪽 긴 변에만 3석씩(왼쪽 3 · 오른쪽 3 = 섬당 6석) → 모두 옆을 보고 앉아 무대를 등지지 않음. 5열 × 5줄 = 25개, 150석
 // 섬 사이 빈 공간 2m: 옆 방향은 의자 끝~의자 끝(의자 넣은 상태), 앞뒤 방향은 테이블 끝~테이블 끝
@@ -298,10 +322,10 @@ function defaultTables(){ const out=[]; let n=0, sx=VIEWS.hall.sx;
     out.push({id:'t'+(n++),x:+((wx-.3)/sx+150).toFixed(1),y,r:90,c:3,b:true}); // 왼쪽 테이블: 의자 왼쪽
     out.push({id:'t'+(n++),x:+((wx+.3)/sx+150).toFixed(1),y,r:90,c:3}); }      // 오른쪽 테이블: 의자 오른쪽
   return out; }
-// 원탁 기본 배치: 지름 1700 원탁에 8석. 의자 끝~의자 끝 2m 간격으로 4열 × 5줄 = 20개, 160석(150명 + 여유 10석)
-// 맨 앞줄 의자 끝은 테이블 섬 배치와 같은 위치(무대에서 2.1m)
+// 원탁 확정 배치(26.10.30): 지름 1700 원탁 8석, 가로 4열 × 세로 3줄 = 12개, 96석. 의자 끝~의자 끝 2m 간격
+// 맨 앞줄 의자 끝은 무대에서 2.1m. 뒤쪽은 네트워킹 공간으로 비움
 function defaultRound(){ const out=[], sx=VIEWS.hall.sx, P=RND.R*2+RND.SEAT*2+2, z0=-9.5+RND.R+RND.SEAT; let n=0;
-  for(let j=0;j<5;j++) for(let i=0;i<4;i++) out.push({id:'r'+(n++),k:'round',x:+((i-1.5)*P/sx+150).toFixed(1),y:+((z0+j*P)/S+160).toFixed(1),r:0,c:8});
+  for(let j=0;j<3;j++) for(let i=0;i<4;i++) out.push({id:'r'+(n++),k:'round',x:+((i-1.5)*P/sx+150).toFixed(1),y:+((z0+j*P)/S+160).toFixed(1),r:0,c:8});
   return out; }
 const chairSides=t=>isRound(t)?[]:t.c===6?[1,-1]:t.c===3?[t.b?-1:1]:[];
 // 원탁 둘레를 16각형으로 근사 (평면 좌표 [x,y] 또는 미터 좌표)
@@ -332,7 +356,7 @@ function hallH(x,y){
 /* ───── 장소·동선 초기값 ───── */
 const SEED={
   seat:'rect',
-  tables:defaultTables(),
+  tables:defaultRound(),
   shown:[],
   places:{
     f1:[
@@ -342,7 +366,7 @@ const SEED={
       {id:'f1_lobby',n:'메인 로비',x:440,y:305},
       {id:'f1_media',n:'미디어월',x:433,y:335},
       {id:'f1_desk',n:'건물 안내데스크 (행사 미사용)',x:378,y:340},
-      {id:'f1_reg',n:'접수테이블',x:490,y:360},
+      {id:'f1_reg',n:'접수테이블',x:509,y:363},
       {id:'f1_flap',n:'보안게이트 (에스컬레이터 · 당일 개방)',x:477,y:362},
       {id:'f1_sec',n:'게이트 (접견실·VIP룸)',x:548,y:424},
       {id:'f1_esc',n:'에스컬레이터 ↓↑ (2단 · 중간 환승)',x:481,y:372,go:'b1'},
@@ -375,8 +399,8 @@ const SEED={
       {id:'h_stage',n:'무대',x:150,y:16},
       {id:'h_podium',n:'포디움 · 사회자 (NC AI 김종호 매니저)',x:33,y:54},
       {id:'h_up',n:'등단·하단 (무대 오른쪽)',x:256,y:26},
-      {id:'h_expoR',n:'전시 구역 1~5',x:266,y:146},
-      {id:'h_expoL',n:'전시 구역 6~10',x:34,y:146},
+      {id:'h_expoR',n:'전시 구역 1~4',x:266,y:127},
+      {id:'h_expoL',n:'전시 구역 5~8',x:34,y:127},
       {id:'h_vip',n:'VIP석',x:150,y:66},
       {id:'h_d1',n:'출입문 1 (폐쇄)',x:292,y:57},
       {id:'h_d2',n:'출입문 2 (폐쇄)',x:292,y:151},
@@ -402,22 +426,28 @@ const KEY='networking-3d:v8';
 const clone=o=>JSON.parse(JSON.stringify(o));
 let state=clone(SEED);
 try{ const s=localStorage.getItem(KEY); if(s){ const d=JSON.parse(s); if(d&&d.places&&d.routes) state=Object.assign(clone(SEED),d); } }catch(e){}
+// 직접 배치한 운영진: 층별 [{id, x, y, n 역할, r 바라보는 방향(도)}]
+const fixStaff=()=>{ state.staff=state.staff&&typeof state.staff==='object'?state.staff:{}; for(const v in VIEWS) state.staff[v]=Array.isArray(state.staff[v])?state.staff[v]:[]; }; fixStaff();
 for(const L of LAYERS){ state.routes[L.id]=state.routes[L.id]||{}; for(const v in VIEWS) state.routes[L.id][v]=state.routes[L.id][v]||[]; }
 // 이름이 바뀐 기본 장소는 저장된 화면에도 반영 (사용자가 직접 바꾼 이름은 그대로)
-const RENAMED={f1_reg:[['접수 테이블'],'접수테이블'], f1_desk:[['안내데스크'],'건물 안내데스크 (행사 미사용)'],
+const RENAMED={h_expoR:[['전시 구역 1~5'],'전시 구역 1~4'], h_expoL:[['전시 구역 6~10'],'전시 구역 5~8'], f1_reg:[['접수 테이블'],'접수테이블'], f1_desk:[['안내데스크'],'건물 안내데스크 (행사 미사용)'],
   h_podium:[['포디움 (무대 아래 · 사용 안 함)'],'포디움 · 사회자 (NC AI 김종호 매니저)'],
   f1_ir:[['접견실 9 · ROOM A (IR 피칭 · VC 3명)'],'접견실 9 (IR 피칭 · VC 3명)'], f1_mr2:[['접견실 10 · ROOM B (IR 피칭 · VC 2명)'],'접견실 10 (IR 피칭 · VC 2명)']};
 for(const v in state.places) (state.places[v]||[]).forEach(p=>{ const r=RENAMED[p.id]; if(r&&r[0].includes(p.n)) p.n=r[1]; });
-(state.places.f1||[]).forEach(p=>{ if(p.id==='f1_desk'&&p.x===374&&p.y===334){ p.x=378; p.y=340; } if(p.id==='f1_reg'&&p.x===500&&p.y===363){ p.x=490; p.y=360; } });
+(state.places.hall||[]).forEach(p=>{ if((p.id==='h_expoR'||p.id==='h_expoL')&&p.y===146) p.y=127; }); // 전시 8개로 줄며 구역 가운데로
+(state.places.f1||[]).forEach(p=>{ if(p.id==='f1_desk'&&p.x===374&&p.y===334){ p.x=378; p.y=340; } if(p.id==='f1_reg'&&((p.x===500&&p.y===363)||(p.x===490&&p.y===360))){ p.x=509; p.y=363; } });
 state.seat='rect';
 if(Array.isArray(state.tables)&&((state.tables.length===80&&state.tables.every((t,i)=>t.id==='t'+i&&!t.r&&t.c===3&&!t.b))||
    (state.tables.length===50&&state.tables.every((t,i)=>t.id==='t'+i&&!t.r&&t.c===3&&!!t.b===(i%2===0)))||
    (state.tables.length===26&&state.tables.every((t,i)=>t.id==='t'+i&&t.r===90&&t.c===6))||
-   (state.tables.length===50&&state.tables[0].x===62.8&&state.tables.every((t,i)=>t.id==='t'+i&&t.r===90&&t.c===3)))) state.tables=defaultTables(); // 예전 기본 배치만 교체(직접 옮긴 배치는 유지)
+   (state.tables.length===50&&state.tables[0].x===62.8&&state.tables.every((t,i)=>t.id==='t'+i&&t.r===90&&t.c===3)))) state.tables=defaultRound(); // 예전 기본 배치만 교체(직접 옮긴 배치는 유지)
+{ const j=JSON.stringify(state.tables), old20=[]; const sx=VIEWS.hall.sx, P=RND.R*2+RND.SEAT*2+2, z0=-9.5+RND.R+RND.SEAT; let n=0;
+  for(let jj=0;jj<5;jj++) for(let i=0;i<4;i++) old20.push({id:'r'+(n++),k:'round',x:+((i-1.5)*P/sx+150).toFixed(1),y:+((z0+jj*P)/S+160).toFixed(1),r:0,c:8});
+  if(j===JSON.stringify(defaultTables())||j===JSON.stringify(old20)) state.tables=defaultRound(); } // 테이블 섬·원탁 20개 기본 배치 → 원탁 12개
 if(state.places.hall){ state.places.hall=state.places.hall.filter(p=>p.id!=='h_seat'&&p.id!=='h_net');
   for(const L in state.routes) (state.routes[L].hall||[]).forEach(r=>{ r.s=r.s.map(x=>(x==='h_seat'||x==='h_net')?TPT.slice():x); }); }
 let shown=new Set(state.shown||[]);
-const save=()=>{ state.shown=[...shown]; try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} $('io').value=JSON.stringify({places:state.places,routes:state.routes,seat:state.seat,tables:state.tables}); };
+const save=()=>{ state.shown=[...shown]; try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} $('io').value=JSON.stringify({places:state.places,routes:state.routes,seat:state.seat,tables:state.tables,staff:state.staff,tlEdit:state.tlEdit||{}}); };
 
 let view='f1', tool='view', editLayer='vip', cur=null, selPlace=null;
 const $=id=>document.getElementById(id);
@@ -591,7 +621,7 @@ function buildF1(){
   // 접수·보안
   flapGates(v,g,476,368,20,-14,4);
   F1_REG.forEach(([x,y])=>rbox(v,g,x,y,14,5,60,.75,M.white));
-  area(v,g,'접수 운영석',(F1_REG[0][0]+F1_REG[1][0])/2+F1_REG_N[0]*9,(F1_REG[0][1]+F1_REG[1][1])/2+F1_REG_N[1]*9,.2,true);
+  area(v,g,'접수 운영석',(F1_REG[0][0]+F1_REG[1][0])/2-F1_REG_N[0]*6,(F1_REG[0][1]+F1_REG[1][1])/2-F1_REG_N[1]*6,.2,true);
   // 게이트: 로봇 조형물 오른쪽 벽 아래, 동서로 통과 (남쪽은 유리 칸막이)
   flapGates(v,g,548,424,22,90,5); glass(v,g,[548,437,548,478],1.2);
   // 코어와 미팅룸 사이: 룸 (통과 불가)
@@ -723,7 +753,7 @@ function buildHall(){
   // 실측 치수선
   dim(v,g,[289,HALL_DOORS[0]+9],[289,HALL_DOORS[2]-9],'출입문 1 끝 ~ 3 시작 17 m');
   dim(v,g,[0,316],[300,316],'뒤쪽 벽 2.15 m × 12칸 = 25.8 m',true);
-  // 전시 테이블 10개 (양쪽 벽을 따라 5개씩, 고정) — 오른쪽은 폐쇄된 출입문 1·2 앞
+  // 전시 테이블 8개 (양쪽 벽을 따라 4개씩, 고정) — 오른쪽은 폐쇄된 출입문 1·2 앞
   { const cloth=new THREE.MeshStandardMaterial({color:0x1f2a4a,roughness:.95}), topM=new THREE.MeshStandardMaterial({color:0xf3f4f6,roughness:.5});
     EXPO.forEach(t=>{ const [a,b]=W(v,t.x,t.y); const grp=new THREE.Group(); grp.position.set(a,0,b); grp.rotation.y=t.r*Math.PI/180;
       const body=edged(mk(new THREE.BoxGeometry(TBL.L,.72,TBL.D),cloth)); body.position.y=.36; grp.add(body);
@@ -795,7 +825,7 @@ function uiTables(){ const n=(state.tables||[]).length, c=(state.tables||[]).red
   if(t){ const r=((t.r||0)%360+360)%360; $('tAng').value=r; $('tAngV').textContent=Math.round(r)+'°'; $('tchairs').value=chairVal(t); } else $('tAngV').textContent='—';
   document.querySelectorAll('.tblicon').forEach(el=>el.setAttribute('aria-pressed',tool==='table'&&el.dataset.k===newKind)); }
 // 새로 놓을 테이블 종류 (직사각형 rect / 원탁 round) · 종류마다 의자 선택값 따로 기억
-let newKind='rect'; const lastChairs={rect:'3',round:'8'};
+let newKind='round'; const lastChairs={rect:'3',round:'8'};
 const CHAIR_OPTS={rect:[['0','없음'],['3','한쪽 3석 (A면)'],['3b','반대쪽 3석 (B면)'],['6','양쪽 6석']],round:[['0','없음'],['6','6석'],['7','7석'],['8','8석']]};
 function chairOpts(k){ const el=$('tchairs'); if(el.dataset.k===k) return; el.dataset.k=k;
   el.innerHTML=CHAIR_OPTS[k].map(([v,n])=>`<option value="${v}">${n}</option>`).join(''); el.value=lastChairs[k]; }
@@ -854,10 +884,10 @@ function stepCrowd(dt){ for(const c of crowd){ if(c.done) continue; c.wait-=dt; 
   c.d=Math.min(c.stop,c.d+c.v*dt); const u=c.d/c.len, p=c.curve.getPointAt(u), tg=c.curve.getTangentAt(u), nl=Math.hypot(tg.x,tg.z)||1;
   c.g.position.set(p.x+tg.z/nl*c.off,p.y-.16,p.z-tg.x/nl*c.off); c.g.rotation.y=Math.atan2(tg.x,tg.z);
   c.ph+=dt*Math.min(c.v,3)*4.5; pose(c.g,c.ph,.55); if(c.d>=c.stop){ c.done=true; pose(c.g,0,0); } } }
-/* 접수 사무국: 접수테이블 뒤에 한 줄로 서서 참석자 쪽(서쪽)을 봄 */
-function regStaff(n){ const [a,b]=F1_REG, u=F1_REG_U, nn=F1_REG_N, L=Math.hypot(b[0]-a[0],b[1]-a[1])+14;
-  for(let k=0;k<n;k++){ const t=(k+.5)/n*L-L/2, cx=(a[0]+b[0])/2+u[0]*t+nn[0]*7, cy=(a[1]+b[1])/2+u[1]*t+nn[1]*7, [x,z]=W('f1',cx,cy), g=person('#0f766e');
-    g.position.set(x,hAt('f1',cx,cy),z); g.rotation.y=Math.atan2(-nn[0],-nn[1]); dyn.add(g); } }
+/* 접수 사무국: 접수테이블 뒤(에스컬레이터 쪽)에 한 줄로 서서 참석자 쪽(로비)을 봄 */
+function regStaff(n){ const [a,b]=F1_REG, u=F1_REG_U, nn=F1_REG_N, L=Math.hypot(b[0]-a[0],b[1]-a[1])+10;
+  for(let k=0;k<n;k++){ const t=(k+.5)/n*L-L/2, cx=(a[0]+b[0])/2+u[0]*t-nn[0]*5, cy=(a[1]+b[1])/2+u[1]*t-nn[1]*5, [x,z]=W('f1',cx,cy), g=person('#0f766e');
+    g.position.set(x,hAt('f1',cx,cy),z); g.rotation.y=Math.atan2(nn[0],nn[1]); dyn.add(g); } }
 /* 한 자리에 서 있는 사람들: 가운데를 보고 둥글게 */
 function standRing(a,y,b,colors){ const m=colors.length, r=Math.max(.75,m*.62/(Math.PI*2));
   colors.forEach((col,k)=>{ const ang=.4+k/m*Math.PI*2, dx=r*Math.cos(ang), dz=r*Math.sin(ang), g=person(col);
@@ -920,9 +950,35 @@ function placeMarker(v,p){
   const o=new CSS2DObject(el); o.position.y=1.45; grp.add(o);
   dyn.add(grp); markerById[p.id]=grp;
 }
+/* 직접 배치한 운영진 */
+let selStaff=null, staffHits=[], staffById={}, sdrag=null;
+const stHitGeo=new THREE.CylinderGeometry(.45,.45,1.8,10);
+function staffMarker(v,o){ const g=person('#0f766e'); const [a,b]=W(v,o.x,o.y); g.position.set(a,hAt(v,o.x,o.y),b); g.rotation.y=(o.r||0)*Math.PI/180;
+  if(o.id===selStaff){ const ring=new THREE.Mesh(new THREE.RingGeometry(.42,.55,24),new THREE.MeshBasicMaterial({color:0xe8590c,side:THREE.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.y=.03; g.add(ring); }
+  const hit=new THREE.Mesh(stHitGeo,headMat); hit.position.y=.9; hit.visible=false; hit.userData.sid=o.id; g.add(hit); staffHits.push(hit);
+  const el=document.createElement('div'); el.className='stl'+(o.id===selStaff?' on':''); el.textContent=o.n||'운영진';
+  const lab=new CSS2DObject(el); lab.position.y=2.05; g.add(lab); dyn.add(g); staffById[o.id]=g; }
+function pickStaff(e){ setNdc(e); const h=ray.intersectObjects(staffHits,false)[0]; return h?h.object.userData.sid:null; }
+const staffOf=id=>state.staff[view].find(o=>o.id===id);
+function addStaff(p){ const n=$('sname').value.trim()||'운영진', id='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,4);
+  state.staff[view].push({id,x:p[0],y:p[1],n,r:0}); selStaff=id; save(); rebuild(); say(`운영진(${n})을 세웠습니다. 끌어서 옮기고, R로 방향을 돌립니다.`); }
+function rotStaff(d=45){ const o=selStaff&&staffOf(selStaff); if(!o) return; o.r=(((o.r||0)+d)%360+360)%360; save(); rebuild(); }
+function delStaff(){ const o=selStaff&&staffOf(selStaff); if(!o) return; state.staff[view]=state.staff[view].filter(q=>q!==o); selStaff=null; save(); rebuild(); say(`운영진(${o.n})을 지웠습니다.`); }
+function startSDrag(id,e){ sdrag={id,sx:e.clientX,sy:e.clientY,moved:false}; controls.enabled=false;
+  window.addEventListener('pointermove',sdragMove); window.addEventListener('pointerup',sdragEnd); }
+function sdragMove(e){ if(!sdrag) return; if(Math.hypot(e.clientX-sdrag.sx,e.clientY-sdrag.sy)>4) sdrag.moved=true; if(!sdrag.moved) return;
+  const p=floorAt(e); if(!p) return; const o=staffOf(sdrag.id); if(!o) return; o.x=p[0]; o.y=p[1];
+  const [a,b]=W(view,p[0],p[1]); staffById[o.id]?.position.set(a,hAt(view,p[0],p[1]),b); }
+function sdragEnd(){ window.removeEventListener('pointermove',sdragMove); window.removeEventListener('pointerup',sdragEnd);
+  const d=sdrag; sdrag=null; down=null; controls.enabled=true; if(!d) return; selStaff=d.id; save(); rebuild(); }
+function uiStaff(){ const all=Object.keys(VIEWS).map(v=>state.staff[v].length), here=state.staff[view].length;
+  $('stCount').textContent=`이 층 ${here}명 · 전체 ${all.reduce((a,b)=>a+b,0)}명 (`+Object.keys(VIEWS).map((v,i)=>`${VIEWS[v].short} ${all[i]}`).join(' · ')+')';
+  const o=tool==='staff'&&selStaff&&staffOf(selStaff); $('stSel').hidden=!o; if(o&&document.activeElement!==$('stName')) $('stName').value=o.n||''; }
+
 function rebuild(){
-  clearDyn();
+  clearDyn(); staffHits=[]; staffById={};
   state.places[view].forEach(p=>placeMarker(view,p));
+  if(tl===null) state.staff[view].forEach(o=>staffMarker(view,o));
   if(tl!==null) drawSlot(); else LAYERS.forEach((L,li)=>{ if(!shown.has(L.id)) return;
     state.routes[L.id][view].forEach((path,pi)=>{ const pts=pathPts(view,path); const editing=cur!==null&&L.id===editLayer&&pi===cur;
       if(pts.length>=2) routeMesh(view,L,li,pts,editing);
@@ -932,17 +988,38 @@ function rebuild(){
 }
 
 /* ───────── 시간대별 시나리오 (운영 시나리오에서 만든 데이터, aaia_hwpx/build_timeline.py) ───────── */
-const TL=/*TL_START*/{"source": "content_운영시나리오_V1.0.json", "slots": [{"t": "12:30~13:00", "title": "사전 준비", "groups": {"booth": "도착, 전시 테이블 세팅", "ops": "VIP룸, 접수, 홀 세팅"}, "staffTotal": "전원", "staffNote": "VIP룸 세팅, 접수 세팅, 홀 세팅(명패, 센터피스, 차단봉), 엑스배너 설치, 전시 구역 안내", "moves": [{"l": "booth", "v": "f1", "s": ["f1_gate", "f1_reg", "f1_flap", "f1_esc"], "note": "전시 기업 도착"}, {"l": "booth", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "booth", "v": "hall", "s": ["h_d3", "h_expoR"], "note": ""}, {"l": "booth", "v": "hall", "s": ["h_d3", "h_expoL"], "note": ""}], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 테이블 세팅(1~5)"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 테이블 세팅(6~10)"}], "staff": [{"v": "f1", "p": "f1_vip", "n": null, "r": "VIP룸 세팅(명찰·배치도·순서지)"}, {"v": "f1", "p": "f1_reg", "n": null, "r": "접수 세팅·명찰 분류"}, {"v": "hall", "p": [169, 165], "n": null, "r": "홀 테이블 세팅(VIP 명패·센터피스)"}, {"v": "hall", "p": "h_d1", "n": null, "r": "출입문 1·2 차단봉"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "전시 구역 안내"}, {"v": "f1", "p": "f1_gate", "n": null, "r": "엑스배너 설치(1층 2·지하 2)"}]}, {"t": "13:00~13:30", "title": "VIP 도착 · 회원사 도착 시작", "groups": {"vip": "도착, VIP룸 대기", "member": "13:20부터 도착", "booth": "전시 테이블 상주", "ir": "13:20부터 도착", "ops": "VIP 영접, 접수 준비"}, "staffTotal": "사무국 8명", "staffNote": "VIP 영접 2, VIP룸 전담 1, 접수 준비 3, 로비 안내 1, 전시 구역 1", "moves": [{"l": "vip", "v": "f1", "s": ["f1_gate", "f1_lobby", "f1_sec", "f1_vip"], "note": "과기정통부(진입 정문 미정)"}, {"l": "vip", "v": "f1", "s": ["f1_east", "f1_sec", "f1_vip"], "note": "과기정통부(측면 정문일 때)"}, {"l": "vip", "v": "f1", "s": ["f1_elevP", "f1_sec", "f1_vip"], "note": "NIPA(주차장 → 엘리베이터)"}, {"l": "member", "v": "f1", "s": ["f1_gate", "f1_reg"], "note": "13:20부터 도착"}, {"l": "member", "v": "f1", "s": ["f1_east", "f1_reg"], "note": "13:20부터 도착"}], "stays": [{"l": "vip", "v": "f1", "p": "f1_vip", "t": "VIP룸 대기(NC AI 센터장 동석)"}, {"l": "member", "v": "f1", "p": "f1_reg", "t": "13:30 접수 시작 대기"}, {"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 테이블 상주"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 테이블 상주"}], "staff": [{"v": "f1", "p": "f1_gate", "n": 1, "r": "VIP 영접(진입 정문)"}, {"v": "f1", "p": "f1_elevP", "n": 1, "r": "VIP 영접(엘리베이터)"}, {"v": "f1", "p": "f1_vip", "n": 1, "r": "VIP룸 전담"}, {"v": "f1", "p": "f1_reg", "n": 3, "r": "접수 준비"}, {"v": "f1", "p": "f1_lobby", "n": 1, "r": "로비 안내"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "전시 구역"}]}, {"t": "13:30~14:00", "title": "접수 · 홀 입장 · VIP 이동(13:50)", "groups": {"vip": "13:50 홀 이동, 착석", "member": "접수, 홀 입장", "booth": "접수, 전시 응대", "ir": "접수, 홀 입장", "ops": "접수, 이동 안내"}, "staffTotal": "사무국 10명", "staffNote": "접수 3, 로비 안내 1, 1층 에스컬레이터 입구 1, 지하 1층 도착 지점 1, 홀 좌석 안내 1, VIP룸 전담 1, VIP 이동 길 안내 1, 전시 구역 1", "moves": [{"l": "member", "v": "f1", "s": ["f1_gate", "f1_reg", "f1_flap", "f1_esc"], "note": "정문 → 접수 → 에스컬레이터"}, {"l": "member", "v": "f1", "s": ["f1_east", "f1_reg", "f1_flap", "f1_esc"], "note": "측면 정문으로 들어올 때"}, {"l": "member", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "member", "v": "hall", "s": ["h_d3", [169, 165]], "note": "배치도 보고 착석"}, {"l": "ir", "v": "f1", "s": ["f1_gate", "f1_reg", "f1_flap", "f1_esc"], "note": "회원사와 같은 동선, 접수 때 피칭 순서 안내"}, {"l": "ir", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "ir", "v": "hall", "s": ["h_d3", [169, 165]], "note": ""}, {"l": "vip", "v": "f1", "s": ["f1_vip", "f1_sec", "f1_flap", "f1_esc"], "note": "13:50 VIP룸 출발"}, {"l": "vip", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "vip", "v": "hall", "s": ["h_d3", "h_vip"], "note": "앞줄 가운데 VIP석"}], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "입장 참석자 응대"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "입장 참석자 응대"}], "staff": [{"v": "f1", "p": "f1_reg", "n": 3, "r": "접수"}, {"v": "f1", "p": "f1_lobby", "n": 1, "r": "로비 안내"}, {"v": "f1", "p": "f1_esc", "n": 1, "r": "1층 에스컬레이터 입구"}, {"v": "b1", "p": "b1_esc", "n": 1, "r": "지하 1층 도착 지점"}, {"v": "hall", "p": [169, 165], "n": 1, "r": "홀 좌석 안내"}, {"v": "f1", "p": "f1_vip", "n": 1, "r": "VIP룸 전담"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "VIP 이동 길 안내(앞장)"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "전시 구역"}]}, {"t": "14:00~14:05", "title": "참석자 소개", "groups": {"vip": "참석자 소개", "member": "참석자 소개", "booth": "참석자 소개", "ir": "참석자 소개", "ops": "사회자 진행, 화면 운영"}, "staffTotal": "사무국 4명, 사회자", "staffNote": "무대 오른쪽(개회 발언자 마이크, 발표 순서, 시간 관리) 1, 화면 운영 1, VIP 응대 1, 접수 잔류 1", "moves": [], "stays": [{"l": "vip", "v": "hall", "p": "h_vip", "t": "VIP석"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "배정 테이블에서 청취"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "무대 오른쪽: 마이크·발표 순서·시간 관리"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 응대"}, {"v": "f1", "p": "f1_reg", "n": 1, "r": "접수 잔류(늦게 온 참석자)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저)"}]}, {"t": "14:05~14:20", "title": "개회사 · 축사 · 환영사", "groups": {"vip": "개회사(NC AI), 축사(과기정통부), 환영사(NIPA) 각 5분", "member": "개회 청취", "booth": "개회 청취", "ir": "개회 청취", "ops": "마이크 전달, 화면 운영"}, "staffTotal": "사무국 4명, 사회자", "staffNote": "무대 오른쪽(개회 발언자 마이크, 발표 순서, 시간 관리) 1, 화면 운영 1, VIP 응대 1, 접수 잔류 1", "moves": [{"l": "vip", "v": "hall", "s": ["h_vip", "h_up", "h_stage"], "note": "무선 마이크 받고 오른쪽으로 등단·하단"}], "stays": [{"l": "vip", "v": "hall", "p": "h_stage", "t": "개회사(NC AI) · 축사(과기정통부) · 환영사(NIPA) 각 5분"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "개회 청취"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "무대 오른쪽: 마이크·발표 순서·시간 관리"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 응대"}, {"v": "f1", "p": "f1_reg", "n": 1, "r": "접수 잔류(늦게 온 참석자)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저)"}]}, {"t": "14:20~14:25", "title": "산업분과 도입 사례집 소개", "groups": {"vip": "사례집 소개 청취", "member": "산업분과 도입 사례집 소개 청취", "booth": "사례집 소개 청취", "ir": "사례집 소개 청취", "ops": "사례집 소개(사회자), 화면 운영"}, "staffTotal": "사무국 4명, 사회자", "staffNote": "무대 오른쪽(개회 발언자 마이크, 발표 순서, 시간 관리) 1, 화면 운영 1, VIP 응대 1, 접수 잔류 1", "moves": [], "stays": [{"l": "ops", "v": "hall", "p": "h_podium", "t": "사례집 소개(사회자)"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "청취"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "무대 오른쪽: 마이크·발표 순서·시간 관리"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 응대"}, {"v": "f1", "p": "f1_reg", "n": 1, "r": "접수 잔류(늦게 온 참석자)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저)"}]}, {"t": "14:25~15:25", "title": "회원사 소개 (6개사 × 10분)", "groups": {"vip": "발표 관람", "member": "발표 청취", "booth": "회원사 소개 6개사(10분씩)", "ir": "발표 청취", "ops": "발표 진행, 시간 관리"}, "staffTotal": "사무국 4명, 사회자", "staffNote": "무대 오른쪽(개회 발언자 마이크, 발표 순서, 시간 관리) 1, 화면 운영 1, VIP 응대 1, 접수 잔류 1", "moves": [{"l": "booth", "v": "hall", "s": [[169, 165], "h_up", "h_stage"], "note": "발표 기업: 무대 오른쪽 대기 → 등단 → 오른쪽 하단"}], "stays": [{"l": "booth", "v": "hall", "p": "h_stage", "t": "회원사 소개 발표(기업당 10분)"}, {"l": "vip", "v": "hall", "p": "h_vip", "t": "발표 관람"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "발표 청취"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "무대 오른쪽: 마이크·발표 순서·시간 관리"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 응대"}, {"v": "f1", "p": "f1_reg", "n": 1, "r": "접수 잔류(늦게 온 참석자)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저)"}]}, {"t": "15:25~15:35", "title": "Coffee Break", "groups": {"vip": "전시 라운딩", "member": "Coffee Break, 전시 관람", "booth": "전시 응대", "ir": "1번 기업 1층 이동", "ops": "Coffee Break 다과, 이동 안내"}, "staffTotal": "사무국 4명", "staffNote": "다과 구역 1, 전시 구역 1, VIP 수행 1, IR 기업 이동 안내 1", "moves": [{"l": "vip", "v": "hall", "s": ["h_vip", "h_expoR"], "note": "전시 테이블 라운딩"}, {"l": "member", "v": "hall", "s": [[169, 165], "h_expoL"], "note": "다과·전시 관람"}, {"l": "ir", "v": "hall", "s": [[169, 165], "h_d3"], "note": "1번 기업 2개사 피칭룸 이동"}, {"l": "ir", "v": "b1", "s": ["b1_d3", "b1_lobby", "b1_gate", "b1_esc"], "note": ""}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_ir"], "note": "1번 기업 → 접견실 9"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_mr2"], "note": "1번 기업 → 접견실 10"}], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "관람객 응대"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "관람객 응대"}], "staff": [{"v": "hall", "p": [150, 288], "n": 1, "r": "다과 구역(위치 미정)"}, {"v": "hall", "p": "h_expoL", "n": 1, "r": "전시 구역"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "VIP 수행"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "IR 기업 이동 안내"}]}, {"t": "15:35~15:55", "title": "네트워킹 세션 1 · IR 피칭 1번", "groups": {"vip": "테이블 환담", "member": "네트워킹 세션 1", "booth": "전시 중점 운영", "ir": "1번 기업 피칭(룸별)", "ops": "테이블 순회", "vc": "VC 3명 상주·피드백, VC 2명 상주·피드백"}, "staffTotal": "사무국 5명, 사회자, NIPA", "staffNote": "테이블 순회 2, 화면 운영 1, VIP 수행 1, IR 기업 이동 안내 1, 피칭룸 2곳 진행(NIPA)", "moves": [], "stays": [{"l": "ir", "v": "f1", "p": "f1_ir", "t": "1번 기업 피칭(20분)"}, {"l": "ir", "v": "f1", "p": "f1_mr2", "t": "1번 기업 피칭(20분)"}, {"l": "vc", "v": "f1", "p": "f1_ir", "t": "VC 3명 상주·피드백"}, {"l": "vc", "v": "f1", "p": "f1_mr2", "t": "VC 2명 상주·피드백"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "네트워킹 세션 1 (배정 테이블)"}, {"l": "vip", "v": "hall", "p": [169, 165], "t": "테이블 환담"}, {"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 중점 운영"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 중점 운영"}], "staff": [{"v": "hall", "p": [169, 165], "n": 2, "r": "테이블 순회"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": [169, 165], "n": 1, "r": "VIP 수행"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "IR 기업 이동 안내"}, {"v": "f1", "p": "f1_ir", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "f1", "p": "f1_mr2", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저): 세션 시작 안내"}]}, {"t": "15:55~16:15", "title": "네트워킹 세션 2 · IR 피칭 2번", "groups": {"vip": "테이블 환담", "member": "네트워킹 세션 2", "booth": "전시 중점 운영", "ir": "2번 기업 피칭(룸별)", "ops": "세션 전환 안내", "vc": "VC 3명 상주·피드백, VC 2명 상주·피드백"}, "staffTotal": "사무국 5명, 사회자, NIPA", "staffNote": "테이블 순회 2, 화면 운영 1, VIP 수행 1, IR 기업 이동 안내 1, 피칭룸 2곳 진행(NIPA)", "moves": [{"l": "ir", "v": "f1", "s": ["f1_ir", "f1_sec", "f1_flap", "f1_esc"], "note": "1번 기업 홀 복귀"}, {"l": "ir", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": "앞 순서 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": ["h_d3", [169, 165]], "note": "앞 순서 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": [[169, 165], "h_d3"], "note": "2번 기업 피칭룸 이동"}, {"l": "ir", "v": "b1", "s": ["b1_d3", "b1_lobby", "b1_gate", "b1_esc"], "note": "2번 기업 피칭룸 이동"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_ir"], "note": "2번 기업 → 접견실 9"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_mr2"], "note": "2번 기업 → 접견실 10"}], "stays": [{"l": "ir", "v": "f1", "p": "f1_ir", "t": "2번 기업 피칭(20분)"}, {"l": "ir", "v": "f1", "p": "f1_mr2", "t": "2번 기업 피칭(20분)"}, {"l": "vc", "v": "f1", "p": "f1_ir", "t": "VC 3명 상주·피드백"}, {"l": "vc", "v": "f1", "p": "f1_mr2", "t": "VC 2명 상주·피드백"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "네트워킹 세션 2 (배정 테이블)"}, {"l": "vip", "v": "hall", "p": [169, 165], "t": "테이블 환담"}, {"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 중점 운영"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 중점 운영"}], "staff": [{"v": "hall", "p": [169, 165], "n": 2, "r": "테이블 순회"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": [169, 165], "n": 1, "r": "VIP 수행"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "IR 기업 이동 안내"}, {"v": "f1", "p": "f1_ir", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "f1", "p": "f1_mr2", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저): 세션 전환 안내"}]}, {"t": "16:15~16:35", "title": "네트워킹 세션 3 · IR 피칭 3번", "groups": {"vip": "테이블 환담", "member": "네트워킹 세션 3", "booth": "전시 중점 운영", "ir": "3번 기업 피칭(룸별)", "ops": "세션 전환 안내", "vc": "VC 3명 상주·피드백, VC 2명 상주·피드백"}, "staffTotal": "사무국 5명, 사회자, NIPA", "staffNote": "테이블 순회 2, 화면 운영 1, VIP 수행 1, IR 기업 이동 안내 1, 피칭룸 2곳 진행(NIPA)", "moves": [{"l": "ir", "v": "f1", "s": ["f1_ir", "f1_sec", "f1_flap", "f1_esc"], "note": "2번 기업 홀 복귀"}, {"l": "ir", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": "앞 순서 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": ["h_d3", [169, 165]], "note": "앞 순서 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": [[169, 165], "h_d3"], "note": "3번 기업 피칭룸 이동"}, {"l": "ir", "v": "b1", "s": ["b1_d3", "b1_lobby", "b1_gate", "b1_esc"], "note": "3번 기업 피칭룸 이동"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_ir"], "note": "3번 기업 → 접견실 9"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_mr2"], "note": "3번 기업 → 접견실 10"}], "stays": [{"l": "ir", "v": "f1", "p": "f1_ir", "t": "3번 기업 피칭(20분)"}, {"l": "ir", "v": "f1", "p": "f1_mr2", "t": "3번 기업 피칭(20분)"}, {"l": "vc", "v": "f1", "p": "f1_ir", "t": "VC 3명 상주·피드백"}, {"l": "vc", "v": "f1", "p": "f1_mr2", "t": "VC 2명 상주·피드백"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "네트워킹 세션 3 (배정 테이블)"}, {"l": "vip", "v": "hall", "p": [169, 165], "t": "테이블 환담"}, {"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 중점 운영"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 중점 운영"}], "staff": [{"v": "hall", "p": [169, 165], "n": 2, "r": "테이블 순회"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": [169, 165], "n": 1, "r": "VIP 수행"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "IR 기업 이동 안내"}, {"v": "f1", "p": "f1_ir", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "f1", "p": "f1_mr2", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저): 세션 전환 안내"}]}, {"t": "16:35~16:50", "title": "VC 강연: 투자 관점 및 IR 피칭 노하우", "groups": {"vip": "VC 강연 청취(협의 8번)", "member": "VC 강연 청취", "booth": "VC 강연 청취", "ir": "VC 강연 청취", "ops": "VC 강연 진행", "vc": "VC 강연(15분), 강연 VC(NIPA 동행), 오른쪽으로 등단"}, "staffTotal": "사무국 3명, 사회자", "staffNote": "마이크 1, 화면 운영 1, VIP 수행 1", "moves": [{"l": "vc", "v": "f1", "s": ["f1_ir", "f1_sec", "f1_flap", "f1_esc"], "note": "강연 VC(NIPA 동행)"}, {"l": "vc", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "vc", "v": "hall", "s": ["h_d3", "h_up", "h_stage"], "note": "오른쪽으로 등단"}, {"l": "ir", "v": "f1", "s": ["f1_mr2", "f1_sec", "f1_flap", "f1_esc"], "note": "3번 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": ["h_d3", [169, 165]], "note": "3번 기업 홀 복귀"}], "stays": [{"l": "vc", "v": "hall", "p": "h_stage", "t": "VC 강연(15분)"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "세션 3 테이블에서 그대로 청취"}, {"l": "vip", "v": "hall", "p": "h_vip", "t": "협의 8번: 16:35 이후 VIP 일정"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "마이크"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 수행"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저) 진행"}]}, {"t": "16:50~17:00", "title": "정리 및 마무리 · 퇴장", "groups": {"vip": "정리 및 마무리(협의 8번)", "member": "정리 및 마무리, 퇴장", "booth": "정리 및 마무리, 철거 준비", "ir": "정리 및 마무리, 퇴장", "ops": "배웅"}, "staffTotal": "사무국 3명", "staffNote": "출입문 배웅 1, 1층 도착 지점 1, 전시 구역 1", "moves": [{"l": "member", "v": "hall", "s": [[169, 165], "h_d3"], "note": "맨 뒤 출입문으로 퇴장"}, {"l": "member", "v": "b1", "s": ["b1_d3", "b1_lobby", "b1_gate", "b1_esc"], "note": "올라가는 에스컬레이터"}, {"l": "member", "v": "f1", "s": ["f1_esc", "f1_flap", "f1_gate"], "note": "정문으로 퇴장"}], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "철거 준비"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "철거 준비"}, {"l": "vip", "v": "hall", "p": "h_vip", "t": "협의 8번: VIP룸 대기·네트워킹·퇴장 중 선택"}], "staff": [{"v": "hall", "p": "h_d3", "n": 1, "r": "출입문 배웅"}, {"v": "f1", "p": "f1_esc", "n": 1, "r": "1층 도착 지점"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "전시 구역"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저) 정리 멘트"}]}, {"t": "17:00 이후", "title": "철거 · 회수", "groups": {"booth": "전시 테이블 철거", "ops": "회수, 철수"}, "staffTotal": "", "staffNote": "", "moves": [], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 테이블 철거"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 테이블 철거"}, {"l": "ops", "v": "f1", "p": "f1_vip", "t": "VIP룸 17:00까지 사용"}], "staff": [{"v": "hall", "p": [169, 165], "n": null, "r": "VIP 명패·센터피스 회수"}, {"v": "hall", "p": "h_d1", "n": null, "r": "차단봉 회수"}, {"v": "f1", "p": "f1_reg", "n": null, "r": "접수 물품·엑스배너 회수"}]}]}/*TL_END*/;
+const TL=/*TL_START*/{"source": "content_운영시나리오_V1.0.json", "slots": [{"t": "12:30~13:00", "title": "사전 준비", "groups": {"booth": "도착, 전시 테이블 세팅", "ops": "VIP룸, 접수, 홀 세팅"}, "staffTotal": "전원", "staffNote": "VIP룸 세팅, 접수 세팅, 홀 세팅(명패, 센터피스, 차단봉), 엑스배너 설치, 전시 구역 안내", "moves": [{"l": "booth", "v": "f1", "s": ["f1_gate", "f1_reg", "f1_flap", "f1_esc"], "note": "전시 기업 도착"}, {"l": "booth", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "booth", "v": "hall", "s": ["h_d3", "h_expoR"], "note": ""}, {"l": "booth", "v": "hall", "s": ["h_d3", "h_expoL"], "note": ""}], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 테이블 세팅(1~4)"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 테이블 세팅(5~8)"}], "staff": [{"v": "f1", "p": "f1_vip", "n": null, "r": "VIP룸 세팅(명찰·배치도·순서지)"}, {"v": "f1", "p": "f1_reg", "n": null, "r": "접수 세팅·명찰 분류"}, {"v": "hall", "p": [169, 165], "n": null, "r": "홀 테이블 세팅(VIP 명패·센터피스)"}, {"v": "hall", "p": "h_d1", "n": null, "r": "출입문 1·2 차단봉"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "전시 구역 안내"}, {"v": "f1", "p": "f1_gate", "n": null, "r": "엑스배너 설치(1층 2·지하 2)"}]}, {"t": "13:00~13:30", "title": "VIP 도착 · 회원사 도착 시작", "groups": {"vip": "도착, VIP룸 대기", "member": "13:20부터 도착", "booth": "전시 테이블 상주", "ir": "13:20부터 도착", "ops": "VIP 영접, 접수 준비"}, "staffTotal": "사무국 8명", "staffNote": "VIP 영접 2, VIP룸 전담 1, 접수 준비 3, 로비 안내 1, 전시 구역 1", "moves": [{"l": "vip", "v": "f1", "s": ["f1_gate", "f1_lobby", "f1_sec", "f1_vip"], "note": "과기정통부(진입 정문 미정)"}, {"l": "vip", "v": "f1", "s": ["f1_east", "f1_sec", "f1_vip"], "note": "과기정통부(측면 정문일 때)"}, {"l": "vip", "v": "f1", "s": ["f1_elevP", "f1_sec", "f1_vip"], "note": "NIPA(주차장 → 엘리베이터)"}, {"l": "member", "v": "f1", "s": ["f1_gate", "f1_reg"], "note": "13:20부터 도착"}, {"l": "member", "v": "f1", "s": ["f1_east", "f1_reg"], "note": "13:20부터 도착"}], "stays": [{"l": "vip", "v": "f1", "p": "f1_vip", "t": "VIP룸 대기(NC AI 센터장 동석)"}, {"l": "member", "v": "f1", "p": "f1_reg", "t": "13:30 접수 시작 대기"}, {"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 테이블 상주"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 테이블 상주"}], "staff": [{"v": "f1", "p": "f1_gate", "n": 1, "r": "VIP 영접(진입 정문)"}, {"v": "f1", "p": "f1_elevP", "n": 1, "r": "VIP 영접(엘리베이터)"}, {"v": "f1", "p": "f1_vip", "n": 1, "r": "VIP룸 전담"}, {"v": "f1", "p": "f1_reg", "n": 3, "r": "접수 준비"}, {"v": "f1", "p": "f1_lobby", "n": 1, "r": "로비 안내"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "전시 구역"}]}, {"t": "13:30~14:00", "title": "접수 · 홀 입장 · VIP 이동(13:50)", "groups": {"vip": "13:50 홀 이동, 착석", "member": "접수, 홀 입장", "booth": "접수, 전시 응대", "ir": "접수, 홀 입장", "ops": "접수, 이동 안내"}, "staffTotal": "사무국 10명", "staffNote": "접수 3, 로비 안내 1, 1층 에스컬레이터 입구 1, 지하 1층 도착 지점 1, 홀 좌석 안내 1, VIP룸 전담 1, VIP 이동 길 안내 1, 전시 구역 1", "moves": [{"l": "member", "v": "f1", "s": ["f1_gate", "f1_reg", "f1_flap", "f1_esc"], "note": "정문 → 접수 → 에스컬레이터"}, {"l": "member", "v": "f1", "s": ["f1_east", "f1_reg", "f1_flap", "f1_esc"], "note": "측면 정문으로 들어올 때"}, {"l": "member", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "member", "v": "hall", "s": ["h_d3", [169, 165]], "note": "배치도 보고 착석"}, {"l": "ir", "v": "f1", "s": ["f1_gate", "f1_reg", "f1_flap", "f1_esc"], "note": "회원사와 같은 동선, 접수 때 피칭 순서 안내"}, {"l": "ir", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "ir", "v": "hall", "s": ["h_d3", [169, 165]], "note": ""}, {"l": "vip", "v": "f1", "s": ["f1_vip", "f1_sec", "f1_flap", "f1_esc"], "note": "13:50 VIP룸 출발"}, {"l": "vip", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "vip", "v": "hall", "s": ["h_d3", "h_vip"], "note": "앞줄 가운데 VIP석"}], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "입장 참석자 응대"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "입장 참석자 응대"}], "staff": [{"v": "f1", "p": "f1_reg", "n": 3, "r": "접수"}, {"v": "f1", "p": "f1_lobby", "n": 1, "r": "로비 안내"}, {"v": "f1", "p": "f1_esc", "n": 1, "r": "1층 에스컬레이터 입구"}, {"v": "b1", "p": "b1_esc", "n": 1, "r": "지하 1층 도착 지점"}, {"v": "hall", "p": [169, 165], "n": 1, "r": "홀 좌석 안내"}, {"v": "f1", "p": "f1_vip", "n": 1, "r": "VIP룸 전담"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "VIP 이동 길 안내(앞장)"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "전시 구역"}]}, {"t": "14:00~14:05", "title": "참석자 소개", "groups": {"vip": "참석자 소개", "member": "참석자 소개", "booth": "참석자 소개", "ir": "참석자 소개", "ops": "사회자 진행, 화면 운영"}, "staffTotal": "사무국 4명, 사회자", "staffNote": "무대 오른쪽(개회 발언자 마이크, 발표 순서, 시간 관리) 1, 화면 운영 1, VIP 응대 1, 접수 잔류 1", "moves": [], "stays": [{"l": "vip", "v": "hall", "p": "h_vip", "t": "VIP석"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "배정 테이블에서 청취"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "무대 오른쪽: 마이크·발표 순서·시간 관리"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 응대"}, {"v": "f1", "p": "f1_reg", "n": 1, "r": "접수 잔류(늦게 온 참석자)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저)"}]}, {"t": "14:05~14:20", "title": "개회사 · 축사 · 환영사", "groups": {"vip": "개회사(NC AI), 축사(과기정통부), 환영사(NIPA) 각 5분", "member": "개회 청취", "booth": "개회 청취", "ir": "개회 청취", "ops": "마이크 전달, 화면 운영"}, "staffTotal": "사무국 4명, 사회자", "staffNote": "무대 오른쪽(개회 발언자 마이크, 발표 순서, 시간 관리) 1, 화면 운영 1, VIP 응대 1, 접수 잔류 1", "moves": [{"l": "vip", "v": "hall", "s": ["h_vip", "h_up", "h_stage"], "note": "무선 마이크 받고 오른쪽으로 등단·하단"}], "stays": [{"l": "vip", "v": "hall", "p": "h_stage", "t": "개회사(NC AI) · 축사(과기정통부) · 환영사(NIPA) 각 5분"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "개회 청취"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "무대 오른쪽: 마이크·발표 순서·시간 관리"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 응대"}, {"v": "f1", "p": "f1_reg", "n": 1, "r": "접수 잔류(늦게 온 참석자)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저)"}]}, {"t": "14:20~14:25", "title": "산업분과 도입 사례집 소개", "groups": {"vip": "사례집 소개 청취", "member": "산업분과 도입 사례집 소개 청취", "booth": "사례집 소개 청취", "ir": "사례집 소개 청취", "ops": "사례집 소개(사회자), 화면 운영"}, "staffTotal": "사무국 4명, 사회자", "staffNote": "무대 오른쪽(개회 발언자 마이크, 발표 순서, 시간 관리) 1, 화면 운영 1, VIP 응대 1, 접수 잔류 1", "moves": [], "stays": [{"l": "ops", "v": "hall", "p": "h_podium", "t": "사례집 소개(사회자)"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "청취"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "무대 오른쪽: 마이크·발표 순서·시간 관리"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 응대"}, {"v": "f1", "p": "f1_reg", "n": 1, "r": "접수 잔류(늦게 온 참석자)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저)"}]}, {"t": "14:25~15:25", "title": "회원사 소개 (6개사 × 10분)", "groups": {"vip": "발표 관람", "member": "발표 청취", "booth": "회원사 소개 6개사(10분씩)", "ir": "발표 청취", "ops": "발표 진행, 시간 관리"}, "staffTotal": "사무국 4명, 사회자", "staffNote": "무대 오른쪽(개회 발언자 마이크, 발표 순서, 시간 관리) 1, 화면 운영 1, VIP 응대 1, 접수 잔류 1", "moves": [{"l": "booth", "v": "hall", "s": [[169, 165], "h_up", "h_stage"], "note": "발표 기업: 무대 오른쪽 대기 → 등단 → 오른쪽 하단"}], "stays": [{"l": "booth", "v": "hall", "p": "h_stage", "t": "회원사 소개 발표(기업당 10분)"}, {"l": "vip", "v": "hall", "p": "h_vip", "t": "발표 관람"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "발표 청취"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "무대 오른쪽: 마이크·발표 순서·시간 관리"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 응대"}, {"v": "f1", "p": "f1_reg", "n": 1, "r": "접수 잔류(늦게 온 참석자)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저)"}]}, {"t": "15:25~15:35", "title": "Coffee Break", "groups": {"vip": "전시 라운딩", "member": "Coffee Break, 전시 관람", "booth": "전시 응대", "ir": "1번 기업 1층 이동", "ops": "Coffee Break 다과, 이동 안내"}, "staffTotal": "사무국 4명", "staffNote": "다과 구역 1, 전시 구역 1, VIP 수행 1, IR 기업 이동 안내 1", "moves": [{"l": "vip", "v": "hall", "s": ["h_vip", "h_expoR"], "note": "전시 테이블 라운딩"}, {"l": "member", "v": "hall", "s": [[169, 165], "h_expoL"], "note": "다과·전시 관람"}, {"l": "ir", "v": "hall", "s": [[169, 165], "h_d3"], "note": "1번 기업 2개사 피칭룸 이동"}, {"l": "ir", "v": "b1", "s": ["b1_d3", "b1_lobby", "b1_gate", "b1_esc"], "note": ""}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_ir"], "note": "1번 기업 → 접견실 9"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_mr2"], "note": "1번 기업 → 접견실 10"}], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "관람객 응대"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "관람객 응대"}], "staff": [{"v": "hall", "p": [150, 288], "n": 1, "r": "다과 구역(위치 미정)"}, {"v": "hall", "p": "h_expoL", "n": 1, "r": "전시 구역"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "VIP 수행"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "IR 기업 이동 안내"}]}, {"t": "15:35~15:55", "title": "네트워킹 세션 1 · IR 피칭 1번", "groups": {"vip": "테이블 환담", "member": "네트워킹 세션 1", "booth": "전시 중점 운영", "ir": "1번 기업 피칭(룸별)", "ops": "테이블 순회", "vc": "VC 3명 상주·피드백, VC 2명 상주·피드백"}, "staffTotal": "사무국 5명, 사회자, NIPA", "staffNote": "테이블 순회 2, 화면 운영 1, VIP 수행 1, IR 기업 이동 안내 1, 피칭룸 2곳 진행(NIPA)", "moves": [], "stays": [{"l": "ir", "v": "f1", "p": "f1_ir", "t": "1번 기업 피칭(20분)"}, {"l": "ir", "v": "f1", "p": "f1_mr2", "t": "1번 기업 피칭(20분)"}, {"l": "vc", "v": "f1", "p": "f1_ir", "t": "VC 3명 상주·피드백"}, {"l": "vc", "v": "f1", "p": "f1_mr2", "t": "VC 2명 상주·피드백"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "네트워킹 세션 1 (배정 테이블)"}, {"l": "vip", "v": "hall", "p": [169, 165], "t": "테이블 환담"}, {"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 중점 운영"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 중점 운영"}], "staff": [{"v": "hall", "p": [169, 165], "n": 2, "r": "테이블 순회"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": [169, 165], "n": 1, "r": "VIP 수행"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "IR 기업 이동 안내"}, {"v": "f1", "p": "f1_ir", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "f1", "p": "f1_mr2", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저): 세션 시작 안내"}]}, {"t": "15:55~16:15", "title": "네트워킹 세션 2 · IR 피칭 2번", "groups": {"vip": "테이블 환담", "member": "네트워킹 세션 2", "booth": "전시 중점 운영", "ir": "2번 기업 피칭(룸별)", "ops": "세션 전환 안내", "vc": "VC 3명 상주·피드백, VC 2명 상주·피드백"}, "staffTotal": "사무국 5명, 사회자, NIPA", "staffNote": "테이블 순회 2, 화면 운영 1, VIP 수행 1, IR 기업 이동 안내 1, 피칭룸 2곳 진행(NIPA)", "moves": [{"l": "ir", "v": "f1", "s": ["f1_ir", "f1_sec", "f1_flap", "f1_esc"], "note": "1번 기업 홀 복귀"}, {"l": "ir", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": "앞 순서 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": ["h_d3", [169, 165]], "note": "앞 순서 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": [[169, 165], "h_d3"], "note": "2번 기업 피칭룸 이동"}, {"l": "ir", "v": "b1", "s": ["b1_d3", "b1_lobby", "b1_gate", "b1_esc"], "note": "2번 기업 피칭룸 이동"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_ir"], "note": "2번 기업 → 접견실 9"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_mr2"], "note": "2번 기업 → 접견실 10"}], "stays": [{"l": "ir", "v": "f1", "p": "f1_ir", "t": "2번 기업 피칭(20분)"}, {"l": "ir", "v": "f1", "p": "f1_mr2", "t": "2번 기업 피칭(20분)"}, {"l": "vc", "v": "f1", "p": "f1_ir", "t": "VC 3명 상주·피드백"}, {"l": "vc", "v": "f1", "p": "f1_mr2", "t": "VC 2명 상주·피드백"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "네트워킹 세션 2 (배정 테이블)"}, {"l": "vip", "v": "hall", "p": [169, 165], "t": "테이블 환담"}, {"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 중점 운영"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 중점 운영"}], "staff": [{"v": "hall", "p": [169, 165], "n": 2, "r": "테이블 순회"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": [169, 165], "n": 1, "r": "VIP 수행"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "IR 기업 이동 안내"}, {"v": "f1", "p": "f1_ir", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "f1", "p": "f1_mr2", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저): 세션 전환 안내"}]}, {"t": "16:15~16:35", "title": "네트워킹 세션 3 · IR 피칭 3번", "groups": {"vip": "테이블 환담", "member": "네트워킹 세션 3", "booth": "전시 중점 운영", "ir": "3번 기업 피칭(룸별)", "ops": "세션 전환 안내", "vc": "VC 3명 상주·피드백, VC 2명 상주·피드백"}, "staffTotal": "사무국 5명, 사회자, NIPA", "staffNote": "테이블 순회 2, 화면 운영 1, VIP 수행 1, IR 기업 이동 안내 1, 피칭룸 2곳 진행(NIPA)", "moves": [{"l": "ir", "v": "f1", "s": ["f1_ir", "f1_sec", "f1_flap", "f1_esc"], "note": "2번 기업 홀 복귀"}, {"l": "ir", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": "앞 순서 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": ["h_d3", [169, 165]], "note": "앞 순서 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": [[169, 165], "h_d3"], "note": "3번 기업 피칭룸 이동"}, {"l": "ir", "v": "b1", "s": ["b1_d3", "b1_lobby", "b1_gate", "b1_esc"], "note": "3번 기업 피칭룸 이동"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_ir"], "note": "3번 기업 → 접견실 9"}, {"l": "ir", "v": "f1", "s": ["f1_esc", "f1_sec", "f1_mr2"], "note": "3번 기업 → 접견실 10"}], "stays": [{"l": "ir", "v": "f1", "p": "f1_ir", "t": "3번 기업 피칭(20분)"}, {"l": "ir", "v": "f1", "p": "f1_mr2", "t": "3번 기업 피칭(20분)"}, {"l": "vc", "v": "f1", "p": "f1_ir", "t": "VC 3명 상주·피드백"}, {"l": "vc", "v": "f1", "p": "f1_mr2", "t": "VC 2명 상주·피드백"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "네트워킹 세션 3 (배정 테이블)"}, {"l": "vip", "v": "hall", "p": [169, 165], "t": "테이블 환담"}, {"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 중점 운영"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 중점 운영"}], "staff": [{"v": "hall", "p": [169, 165], "n": 2, "r": "테이블 순회"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": [169, 165], "n": 1, "r": "VIP 수행"}, {"v": "f1", "p": "f1_sec", "n": 1, "r": "IR 기업 이동 안내"}, {"v": "f1", "p": "f1_ir", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "f1", "p": "f1_mr2", "n": null, "r": "피칭룸 진행(NIPA)"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저): 세션 전환 안내"}]}, {"t": "16:35~16:50", "title": "VC 강연: 투자 관점 및 IR 피칭 노하우", "groups": {"vip": "VC 강연 청취(협의 8번)", "member": "VC 강연 청취", "booth": "VC 강연 청취", "ir": "VC 강연 청취", "ops": "VC 강연 진행", "vc": "VC 강연(15분), 강연 VC(NIPA 동행), 오른쪽으로 등단"}, "staffTotal": "사무국 3명, 사회자", "staffNote": "마이크 1, 화면 운영 1, VIP 수행 1", "moves": [{"l": "vc", "v": "f1", "s": ["f1_ir", "f1_sec", "f1_flap", "f1_esc"], "note": "강연 VC(NIPA 동행)"}, {"l": "vc", "v": "b1", "s": ["b1_esc", "b1_gate", "b1_lobby", "b1_d3"], "note": ""}, {"l": "vc", "v": "hall", "s": ["h_d3", "h_up", "h_stage"], "note": "오른쪽으로 등단"}, {"l": "ir", "v": "f1", "s": ["f1_mr2", "f1_sec", "f1_flap", "f1_esc"], "note": "3번 기업 홀 복귀"}, {"l": "ir", "v": "hall", "s": ["h_d3", [169, 165]], "note": "3번 기업 홀 복귀"}], "stays": [{"l": "vc", "v": "hall", "p": "h_stage", "t": "VC 강연(15분)"}, {"l": "member", "v": "hall", "p": [169, 165], "t": "세션 3 테이블에서 그대로 청취"}, {"l": "vip", "v": "hall", "p": "h_vip", "t": "협의 8번: 16:35 이후 VIP 일정"}], "staff": [{"v": "hall", "p": "h_up", "n": 1, "r": "마이크"}, {"v": "hall", "p": "h_ctrl", "n": 1, "r": "화면 운영"}, {"v": "hall", "p": "h_vip", "n": 1, "r": "VIP 수행"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저) 진행"}]}, {"t": "16:50~17:00", "title": "정리 및 마무리 · 퇴장", "groups": {"vip": "정리 및 마무리(협의 8번)", "member": "정리 및 마무리, 퇴장", "booth": "정리 및 마무리, 철거 준비", "ir": "정리 및 마무리, 퇴장", "ops": "배웅"}, "staffTotal": "사무국 3명", "staffNote": "출입문 배웅 1, 1층 도착 지점 1, 전시 구역 1", "moves": [{"l": "member", "v": "hall", "s": [[169, 165], "h_d3"], "note": "맨 뒤 출입문으로 퇴장"}, {"l": "member", "v": "b1", "s": ["b1_d3", "b1_lobby", "b1_gate", "b1_esc"], "note": "올라가는 에스컬레이터"}, {"l": "member", "v": "f1", "s": ["f1_esc", "f1_flap", "f1_gate"], "note": "정문으로 퇴장"}], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "철거 준비"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "철거 준비"}, {"l": "vip", "v": "hall", "p": "h_vip", "t": "협의 8번: VIP룸 대기·네트워킹·퇴장 중 선택"}], "staff": [{"v": "hall", "p": "h_d3", "n": 1, "r": "출입문 배웅"}, {"v": "f1", "p": "f1_esc", "n": 1, "r": "1층 도착 지점"}, {"v": "hall", "p": "h_expoR", "n": 1, "r": "전시 구역"}, {"v": "hall", "p": "h_podium", "n": null, "r": "사회자(NC AI 김종호 매니저) 정리 멘트"}]}, {"t": "17:00 이후", "title": "철거 · 회수", "groups": {"booth": "전시 테이블 철거", "ops": "회수, 철수"}, "staffTotal": "", "staffNote": "", "moves": [], "stays": [{"l": "booth", "v": "hall", "p": "h_expoR", "t": "전시 테이블 철거"}, {"l": "booth", "v": "hall", "p": "h_expoL", "t": "전시 테이블 철거"}, {"l": "ops", "v": "f1", "p": "f1_vip", "t": "VIP룸 17:00까지 사용"}], "staff": [{"v": "hall", "p": [169, 165], "n": null, "r": "VIP 명패·센터피스 회수"}, {"v": "hall", "p": "h_d1", "n": null, "r": "차단봉 회수"}, {"v": "f1", "p": "f1_reg", "n": null, "r": "접수 물품·엑스배너 회수"}]}]}/*TL_END*/;
 let tl=null, playing=null, cardMin=false;
 const GNAME={vip:'VIP',member:'회원사',booth:'전시·발표 기업',ir:'IR 피칭 기업',ops:'운영진',vc:'VC'};
 const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const staffGeo=new THREE.CapsuleGeometry(.12,.4,4,8), staffMat=new THREE.MeshStandardMaterial({color:0x0f766e,roughness:.6});
+/* 시간대 편집: 처음 고칠 때 시나리오 원본(이동·머무름·사무국)을 복사해 state.tlEdit[i]에 두고, 그 뒤로는 고친 내용으로 그림 */
+const slotOf=i=>{ const S=TL.slots[i]; if(!S) return S; const E=state.tlEdit&&state.tlEdit[i]; return E?Object.assign({},S,E):S; };
+function editSlot(i){ state.tlEdit=state.tlEdit||{}; if(!state.tlEdit[i]){ const S=TL.slots[i]; state.tlEdit[i]=clone({moves:S.moves,stays:S.stays,staff:S.staff}); } return state.tlEdit[i]; }
+const stopName=(v,x)=>Array.isArray(x)?'지점':(placeById(v,x)?.n||x);
+function uiSlotEdit(){ const sec=$('tlEditSec'); sec.hidden=tl===null||!!playing; $('staffSec').hidden=tl!==null; if(sec.hidden) return;
+  const S=slotOf(tl), edited=!!(state.tlEdit&&state.tlEdit[tl]);
+  $('tleHead').textContent=`${S.t} · ${S.title} · ${VIEWS[view].name}`+(edited?' — 고친 내용 적용 중':' — 시나리오 원본');
+  const rows=[];
+  S.moves.forEach((m,i)=>{ if(m.v!==view) return; const L=LAYERS.find(x=>x.id===m.l);
+    rows.push(`<li><i style="background:${L?L.color:'#64748b'}"></i><span>${escH(GNAME[m.l]||m.l)} 이동 · ${escH(stopName(view,m.s[0]))} → ${escH(stopName(view,m.s[m.s.length-1]))}${m.note?` <span class="k">${escH(m.note)}</span>`:''}</span><button data-del="moves:${i}">삭제</button></li>`); });
+  S.stays.forEach((x,i)=>{ if(x.v!==view) return; const L=LAYERS.find(q=>q.id===x.l);
+    rows.push(`<li><i style="background:${L?L.color:'#64748b'}"></i><span>${escH(GNAME[x.l]||x.l)} 머무름 · ${escH(x.t||'')} <span class="k">${escH(stopName(view,x.p))}</span></span><button data-del="stays:${i}">삭제</button></li>`); });
+  S.staff.forEach((x,i)=>{ if(x.v!==view) return;
+    rows.push(`<li><i style="background:#0f766e"></i><span>사무국${x.n?' '+x.n:''} · ${escH(x.r||'')} <span class="k">${escH(stopName(view,x.p))}</span></span><button data-del="staff:${i}">삭제</button></li>`); });
+  $('tleList').innerHTML=rows.join('')||'<li><span class="k">이 층에는 이 시간대 항목이 없습니다</span></li>';
+  $('tleReset').disabled=!edited; }
+function addSlotPerson(p){ const E=editSlot(tl), t=$('tleText').value.trim();
+  if($('tleKind').value==='stay'){ E.stays.push({l:editLayer,v:view,p:[p[0],p[1]],t:t||'대기'}); say(`${GNAME[editLayer]} 머무는 무리를 세웠습니다.`); }
+  else { E.staff.push({v:view,p:[p[0],p[1]],n:1,r:t||'운영진'}); say('사무국 운영진을 세웠습니다.'); }
+  save(); rebuild(); }
 function slotItems(S,v){ return {moves:S.moves.filter(m=>m.v===v), stays:S.stays.filter(x=>x.v===v), staff:S.staff.filter(x=>x.v===v)}; }
 function slotCount(S,v){ const it=slotItems(S,v); return it.moves.length+it.stays.length+it.staff.length; }
-function drawSlot(){ const S=TL.slots[tl]; if(!S) return; const it=slotItems(S,view);
+function drawSlot(){ const S=slotOf(tl); if(!S) return; const it=slotItems(S,view), editing=cur!==null&&state.tlEdit&&state.tlEdit[tl]?state.tlEdit[tl].moves[cur]:null;
   const walks=[];
-  it.moves.forEach(m=>{ const L=LAYERS.find(x=>x.id===m.l); if(!L) return; const pts=pathPts(view,{m:'auto',s:m.s});
-    if(pts.length>=2){ const r=routeMesh(view,L,LAYERS.indexOf(L),pts,false,true); if(r) walks.push(Object.assign(r,{l:m.l})); } });
+  it.moves.forEach(m=>{ const L=LAYERS.find(x=>x.id===m.l); if(!L) return; const pts=pathPts(view,{m:m.m||'auto',s:m.s});
+    if(m===editing) m.s.forEach((q,k)=>{ const xy=stopXY(view,q); if(xy) numBadge(view,L,xy,k+1); });
+    if(pts.length>=2){ const r=routeMesh(view,L,LAYERS.indexOf(L),pts,m===editing,true); if(r&&m!==editing) walks.push(Object.assign(r,{l:m.l})); } });
   spawnCrowd(walks);
   const arrive=new Set(it.moves.map(m=>m.l+'|'+String(m.s[m.s.length-1]))); // 이번에 걸어 들어오는 무리는 서 있는 사람으로 또 세우지 않음
   const by={}; const add=(pid,o)=>(by[pid]=by[pid]||[]).push(o);
@@ -962,14 +1039,14 @@ function drawSlot(){ const S=TL.slots[tl]; if(!S) return; const it=slotItems(S,v
     if(cols.length) standRing(a,y,b,cols.slice(0,12)); });
 }
 function bestView(S){ let best=view, bn=slotCount(S,view); if(bn) return view; Object.keys(VIEWS).forEach(v=>{ const n=slotCount(S,v); if(n>bn){ bn=n; best=v; } }); return best; }
-function setSlot(i){ tl=(i===null||i<0||i>=TL.slots.length)?null:i;
-  if(tl!==null){ if(cur!==null) finish(); if(tool!=='view'&&tool!=='table') tool='view'; selPlace=null;
-    const v=bestView(TL.slots[tl]); if(v!==view){ setView(v); return; } }
+function setSlot(i){ if(cur!==null) finish(); tl=(i===null||i<0||i>=TL.slots.length)?null:i;
+  if(tl!==null){ if(cur!==null) finish(); if(tool==='place') tool='view'; selPlace=null;
+    const v=bestView(slotOf(tl)); if(v!==view){ setView(v); return; } }
   rebuild(); const btn=$('tlbar').querySelector('[aria-pressed="true"]'); btn?.scrollIntoView({block:'nearest',inline:'nearest'}); }
 let demo=null; // 시연: {i 시간대, fl 보여 줄 층들, fi 지금 층, wait 다음으로 넘어갈 시각}
 function stopPlay(){ playing=null; demo=null; }
 const slotFloors=S=>Object.keys(VIEWS).filter(v=>slotCount(S,v));
-function demoShow(i,fi){ const fl=slotFloors(TL.slots[i]); if(!fl.length) return demoNextFrom(i);
+function demoShow(i,fi){ const fl=slotFloors(slotOf(i)); if(!fl.length) return demoNextFrom(i);
   demo={i,fl,fi,wait:0}; tl=i; if(cur!==null) finish(); if(tool!=='view'&&tool!=='table') tool='view'; selPlace=null;
   if(fl[fi]!==view) setView(fl[fi]); else rebuild();
   $('tlbar').querySelector('[aria-pressed="true"]')?.scrollIntoView({block:'nearest',inline:'nearest'}); }
@@ -981,10 +1058,10 @@ function togglePlay(){ if(playing){ stopPlay(); uiTimeline(); return; }
   playing=true; demoShow(tl===null||tl>=TL.slots.length-1?0:tl,0); uiTimeline(); }
 function uiTimeline(){
   const bar=$('tlbar'); if(!TL.slots.length){ bar.hidden=true; $('tlcard').hidden=true; return; }
-  bar.innerHTML=`<button class="all" data-i="-1" aria-pressed="${tl===null}">편집한 동선</button>`+TL.slots.map((S,i)=>`<button data-i="${i}" aria-pressed="${tl===i}" title="${escH(S.t+' '+S.title)}"><b>${escH(S.t)}</b><span>${escH(S.title)}</span></button>`).join('')+
+  bar.innerHTML=`<button class="all" data-i="-1" aria-pressed="${tl===null}">편집한 동선</button>`+TL.slots.map((S,i)=>`<button data-i="${i}" aria-pressed="${tl===i}" title="${escH(S.t+' '+S.title)}"><b>${escH(S.t)}${state.tlEdit&&state.tlEdit[i]?' ✎':''}</b><span>${escH(S.title)}</span></button>`).join('')+
     `<button class="play" id="tlPlay" aria-pressed="${!!playing}">${playing?'■ 시연 정지':'▶ 시연 재생'}</button>`;
   const card=$('tlcard'); if(tl===null){ card.hidden=true; return; }
-  const S=TL.slots[tl]; card.hidden=false;
+  const S=slotOf(tl); card.hidden=false;
   const fl=Object.keys(VIEWS).map(v=>{ const n=slotCount(S,v); return n?`<button data-go="${v}" aria-pressed="${v===view}">${VIEWS[v].short} ${n}</button>`:''; }).join('');
   card.innerHTML=`<div class="h"><b>${escH(S.t)}</b><span>${escH(S.title)}</span><button class="x" id="tlMin">${cardMin?'펼치기':'접기'}</button></div>`+(cardMin?'':
     `<div class="fl">층별 표시 ${fl}</div>`+Object.entries(S.groups).map(([k,t])=>{ const L=LAYERS.find(x=>x.id===k); return `<div class="g"><i style="background:${L?L.color:'#334155'}"></i><b>${GNAME[k]||k}</b><span>${escH(t)}</span></div>`; }).join('')+
@@ -1016,12 +1093,14 @@ let down=null, drag=null;
 renderer.domElement.addEventListener('pointerdown',e=>{
   down={x:e.clientX,y:e.clientY};
   if(tool==='place'&&e.button===0){ const id=pickPlace(e); if(id) startDrag(id,e); }
+  if(tool==='staff'&&tl===null&&e.button===0){ const id=pickStaff(e); if(id) startSDrag(id,e); }
   if(tool==='table'&&view==='hall'&&state.seat==='rect'&&e.button===0){ const id=pickTable(e); if(id) startTDrag(id,e); }
 });
 renderer.domElement.addEventListener('pointerup',e=>{
-  if(drag||tdrag) return; if(!down) return; const moved=Math.hypot(e.clientX-down.x,e.clientY-down.y); down=null;
+  if(drag||tdrag||sdrag) return; if(!down) return; const moved=Math.hypot(e.clientX-down.x,e.clientY-down.y); down=null;
   if(moved>5||e.button!==0) return;
   if(tool==='table'&&view==='hall'){ const p=floorAt(e); if(p) addTable(p); return; }
+  if(tool==='staff'){ const p=floorAt(e); if(!p) return; if(tl!==null) addSlotPerson(p); else addStaff(p); return; }
   const id=pickPlace(e); if(id) return placeClick(id);
   const p=floorAt(e); if(p) floorClick(p);
 });
@@ -1051,44 +1130,48 @@ function floorClick(p){
     state.places[view].push({id,n,x:p[0],y:p[1]}); selPlace=id; save(); rebuild(); say(`장소 추가: ${n}`); return; }
   if(selPlace){ selPlace=null; rebuild(); }
 }
+const routeList=()=>tl!==null?editSlot(tl).moves:state.routes[editLayer][view]; // 시간대 보기 중이면 그 시간대의 이동 목록
 function addStop(s){
-  const list=state.routes[editLayer][view];
-  if(cur===null){ list.push({m:tool==='auto'?'auto':'draw',s:[]}); cur=list.length-1; }
+  const list=routeList();
+  if(cur===null){ list.push(tl!==null?{l:editLayer,v:view,m:tool==='auto'?'auto':'draw',s:[],note:'직접 추가'}:{m:tool==='auto'?'auto':'draw',s:[]}); cur=list.length-1; }
   const path=list[cur], last=path.s[path.s.length-1];
   if(last!==undefined&&JSON.stringify(last)===JSON.stringify(s)) return;
   path.s.push(s); shown.add(editLayer); save(); rebuild();
   const L=LAYERS.find(l=>l.id===editLayer);
   say(`${L.name} · 점 ${path.s.length}개${path.s.length<2?' — 다음 장소를 누르세요':''}`);
 }
-function finish(){ if(cur===null) return; const list=state.routes[editLayer][view];
+function finish(){ if(cur===null) return; const list=routeList();
   if(list[cur]&&list[cur].s.length<2){ list.splice(cur,1); say('점이 2개 이상이어야 선이 됩니다.'); } else say('선을 완료했습니다.');
   cur=null; save(); rebuild(); }
-function undo(){ const list=state.routes[editLayer][view];
+function undo(){ const list=routeList();
   if(cur!==null){ const p=list[cur]; p.s.pop(); if(!p.s.length){ list.splice(cur,1); cur=null; } say('마지막 점을 지웠습니다.'); }
+  else if(tl!==null){ let k=-1; list.forEach((m,i)=>{ if(m.v===view&&m.l===editLayer) k=i; }); if(k<0) return say('이 층에 지울 이동이 없습니다.'); list.splice(k,1); say('이 시간대의 마지막 이동을 지웠습니다.'); }
   else if(list.length){ list.pop(); say('마지막 선을 지웠습니다.'); } else return say('지울 선이 없습니다.');
   save(); rebuild(); }
 let armed=0;
 function clearLayer(){ const L=LAYERS.find(l=>l.id===editLayer), now=Date.now();
-  if(now-armed<4000){ state.routes[editLayer][view]=[]; cur=null; armed=0; save(); rebuild(); say(`${VIEWS[view].name}의 ${L.name} 동선을 지웠습니다.`); }
+  if(now-armed<4000){ if(tl!==null){ const E=editSlot(tl); E.moves=E.moves.filter(m=>!(m.v===view&&m.l===editLayer)); } else state.routes[editLayer][view]=[]; cur=null; armed=0; save(); rebuild(); say(`${VIEWS[view].name}의 ${L.name} 동선을 지웠습니다.`); }
   else { armed=now; say(`한 번 더 누르면 ${VIEWS[view].name}의 ${L.name} 동선을 모두 지웁니다.`); setTimeout(()=>{ armed=0; },4000); } }
 window.addEventListener('keydown',e=>{ if(e.target.matches('input,textarea,select')) return;
   if(tool==='table'&&selTable){ if(e.key==='r'||e.key==='R'){ rotTable(e.shiftKey?-15:15); return; } if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault(); delTable(); return; } }
+  if(tool==='staff'&&selStaff){ if(e.key==='r'||e.key==='R'){ rotStaff(e.shiftKey?-45:45); return; } if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault(); delStaff(); return; } }
   if(e.key==='Enter'||e.key==='Escape') finish();
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){ e.preventDefault(); undo(); } });
 
 /* ───────── 패널 ───────── */
-const TOOLS=[['view','보기'],['auto','장소 잇기 (자동)'],['draw','직접 그리기'],['place','장소 편집'],['table','테이블 배치']];
+const TOOLS=[['view','보기'],['auto','장소 잇기 (자동)'],['draw','직접 그리기'],['place','장소 편집'],['staff','운영진 배치'],['table','테이블 배치']];
 const HINT={
   view:'드래그 회전 · 휠 확대 · 우클릭 드래그 이동 · ↓↑ 표시 장소를 누르면 그 층으로 넘어갑니다',
   auto:'장소를 차례로 누르면 길을 따라 자동으로 이어집니다 · 빈 바닥은 경유점 · 끝나면 Enter',
   draw:'바닥이나 장소를 차례로 눌러 직선으로 잇습니다 · 끝나면 Enter 또는 두 번 누르기',
   place:'빈 바닥을 누르면 장소 추가 · 장소를 끌어서 이동 · 눌러서 이름 변경·삭제',
+  staff:'빈 바닥 = 운영진 세우기(오른쪽 「새 운영진 역할」 이름으로) · 끌어서 이동 · 눌러서 고르기 · R 방향 45° · Delete 삭제',
   table:'빈 바닥 = 고른 테이블(1800×600 또는 원탁 Ø1700) 추가 · 끌어서 이동 · R / Shift+R 15° 회전 · Delete 삭제',
 };
 const say=t=>{ $('status').textContent=t; };
 function counts(id){ return Object.keys(VIEWS).map(v=>`${VIEWS[v].short} ${state.routes[id][v].length}`).join(' · '); }
 function ui(){
-  $('tabs').innerHTML=Object.entries(VIEWS).map(([k,v])=>{ const n=tl!==null?slotCount(TL.slots[tl],k):0; return `<button data-v="${k}" aria-pressed="${view===k}">${v.name}${n?`<i class="tb">${n}</i>`:''}</button>`; }).join('');
+  $('tabs').innerHTML=Object.entries(VIEWS).map(([k,v])=>{ const n=tl!==null?slotCount(slotOf(tl),k):0; return `<button data-v="${k}" aria-pressed="${view===k}">${v.name}${n?`<i class="tb">${n}</i>`:''}</button>`; }).join('');
   $('chips').innerHTML=LAYERS.map(L=>`<button class="chip" data-l="${L.id}" aria-label="${L.name} 동선 보기" aria-pressed="${shown.has(L.id)}"><i style="background:${L.color}"></i><span>${L.name}</span><small>${counts(L.id)}</small></button>`).join('');
   if(tool==='table'&&view!=='hall') tool='view';
   $('tools').innerHTML=TOOLS.filter(([k])=>k!=='table'||view==='hall').map(([k,n])=>`<button data-t="${k}" aria-pressed="${tool===k}">${n}</button>`).join('');
@@ -1098,12 +1181,13 @@ function ui(){
   const vis=LAYERS.filter(L=>shown.has(L.id)&&state.routes[L.id][view].length);
   $('legend').innerHTML=`<div class="v">${VIEWS[view].name}</div>`+(vis.length?vis.map(L=>`<div class="it"><i style="background:${L.color}"></i>${L.name}</div>`).join(''):
     `<div class="none">${shown.size?'이 층에 그려진 동선이 없습니다':'오른쪽에서 동선을 고르면 선이 나타납니다'}</div>`);
-  if(tl!==null){ const S=TL.slots[tl], it=slotItems(S,view), ls=[...new Set([...it.moves,...it.stays].map(x=>x.l))];
+  if(tl!==null){ const S=slotOf(tl), it=slotItems(S,view), ls=[...new Set([...it.moves,...it.stays].map(x=>x.l))];
     $('legend').innerHTML=`<div class="v">${VIEWS[view].name}</div><div class="none">${escH(S.t)} · ${escH(S.title)}</div>`+
       (ls.length?ls.map(l=>{ const L=LAYERS.find(x=>x.id===l); return L?`<div class="it"><i style="background:${L.color}"></i>${L.name}</div>`:''; }).join(''):'<div class="none">이 층에는 이 시간대 움직임이 없습니다</div>')+
       (it.staff.length?`<div class="it"><i style="background:#0f766e;height:10px;width:10px;border-radius:50%"></i>사무국 배치</div>`:''); }
   uiTimeline();
-  $('hint').textContent=tl!==null?(playing?'시연 중 · 층마다 사람들이 도착하면 다음 층·다음 시간대로 넘어갑니다 · ■ 시연 정지':'시간대 보기 · 아래 막대에서 시간을 고르거나 ▶ 시연 재생 · 층 버튼을 다시 누르면 걷기를 다시 봅니다'):HINT[tool];
+  $('hint').textContent=tl!==null&&!playing&&tool!=='view'&&tool!=='table'?`[${slotOf(tl).t} 시간대 편집] `+(tool==='staff'?'빈 바닥 = 오른쪽 「이 시간대 편집」에서 고른 종류(사무국/머무는 무리)를 세움':HINT[tool]):tl!==null?(playing?'시연 중 · 층마다 사람들이 도착하면 다음 층·다음 시간대로 넘어갑니다 · ■ 시연 정지':'시간대 보기 · 아래 막대에서 시간을 고르거나 ▶ 시연 재생 · 층 버튼을 다시 누르면 걷기를 다시 봅니다'):HINT[tool];
+  uiStaff(); uiSlotEdit();
   const p=selPlace&&placeById(view,selPlace); $('selBox').hidden=!(tool==='place'&&p);
   if(p){ if(document.activeElement!==$('selName')) $('selName').value=p.n; $('selGo').value=p.go||''; }
   renderer.domElement.style.cursor=tool==='view'?'grab':'crosshair';
@@ -1113,7 +1197,7 @@ $('chips').onclick=e=>{ const b=e.target.closest('[data-l]'); if(!b) return; con
 $('allOn').onclick=()=>{ LAYERS.forEach(L=>shown.add(L.id)); save(); rebuild(); };
 $('allOff').onclick=()=>{ shown.clear(); save(); rebuild(); };
 $('tools').onclick=e=>{ const b=e.target.closest('[data-t]'); if(!b) return; if(cur!==null) finish(); tool=b.dataset.t; if(tool!=='place') selPlace=null;
-  if(tool!=='view'&&tool!=='table'){ stopPlay(); tl=null; }
+  if(tool!=='view'&&tool!=='table'){ if(playing){ stopPlay(); uiTimeline(); } if(tool==='place') tl=null; } // 시간대 보기 중 그리기·운영진 배치 = 그 시간대 편집
   if(tool==='auto'||tool==='draw'){ shown.add(editLayer); save(); } rebuild(); say(''); };
 $('editLayer').onchange=e=>{ if(cur!==null) finish(); editLayer=e.target.value; if(tool!=='view'&&tool!=='place'){ shown.add(editLayer); save(); } rebuild(); };
 $('finish').onclick=finish; $('undo').onclick=undo; $('clearLayer').onclick=clearLayer;
@@ -1129,7 +1213,7 @@ $('tAng').oninput=e=>{ const t=selTable&&state.tables.find(q=>q.id===selTable); 
   $('tAngV').textContent=t.r+'°'; tableGroups[t.id].rotation.y=t.r*Math.PI/180; };
 $('tAng').onchange=()=>tablesChanged(); $('tDel').onclick=delTable;
 $('tDefault').onclick=()=>{ state.tables=defaultTables(); selTable=null; newKind='rect'; tablesChanged(); say('기본 배치(세로 테이블 섬 25개 · 테이블 50개 · 150석)로 놓았습니다.'); };
-$('tRound').onclick=()=>{ state.tables=defaultRound(); selTable=null; newKind='round'; tablesChanged(); say('원탁 기본 배치(지름 1700 · 8인 · 4열 × 5줄 = 20개 · 160석, 의자 끝 사이 2m)로 놓았습니다.'); };
+$('tRound').onclick=()=>{ state.tables=defaultRound(); selTable=null; newKind='round'; tablesChanged(); say('확정 배치(원탁 지름 1700 · 8인 · 4열 × 3줄 = 12개 · 96석, 의자 끝 사이 2m)로 놓았습니다.'); };
 let armedT=0;
 $('tClear').onclick=()=>{ const now=Date.now(); if(now-armedT<4000){ state.tables=[]; selTable=null; armedT=0; tablesChanged(); say('테이블을 모두 지웠습니다.'); }
   else { armedT=now; say('한 번 더 누르면 테이블을 모두 지웁니다.'); } };
@@ -1152,13 +1236,23 @@ $('under').onclick=()=>{ under=!under; $('under').setAttribute('aria-pressed',un
 $('camTop').onclick=()=>fly(view,true); $('camReset').onclick=()=>fly(view,false);
 $('copy').onclick=async()=>{ try{ await navigator.clipboard.writeText($('io').value); say('데이터를 복사했습니다.'); }catch(e){ $('io').select(); say('복사가 막혀 있어 내용을 선택해 두었습니다. Ctrl+C로 복사하세요.'); } };
 $('load').onclick=()=>{ try{ const d=JSON.parse($('io').value); if(!d.places||!d.routes) throw 0;
-  state.places=d.places; state.routes=d.routes; if(d.seat) state.seat=d.seat; if(Array.isArray(d.tables)) state.tables=d.tables;
+  state.places=d.places; state.routes=d.routes; if(d.seat) state.seat=d.seat; if(Array.isArray(d.tables)) state.tables=d.tables; if(d.staff) state.staff=d.staff; if(d.tlEdit) state.tlEdit=d.tlEdit; fixStaff(); selStaff=null;
   for(const L of LAYERS){ state.routes[L.id]=state.routes[L.id]||{}; for(const v in VIEWS) state.routes[L.id][v]=state.routes[L.id][v]||[]; }
   for(const v in VIEWS) state.places[v]=state.places[v]||[];
   Object.keys(grids).forEach(k=>delete grids[k]); cur=null; selPlace=null; buildSeats(); save(); rebuild(); say('불러왔습니다.'); }
   catch(e){ say('형식이 맞지 않아 불러오지 못했습니다.'); } };
+$('stName').oninput=e=>{ const o=selStaff&&staffOf(selStaff); if(!o) return; o.n=e.target.value; save(); const el=staffById[o.id]; el?.traverse(q=>{ if(q.isCSS2DObject) q.element.textContent=o.n||'운영진'; }); };
+$('stRot').onclick=()=>rotStaff(45); $('stDel').onclick=delStaff;
+$('tleList').onclick=e=>{ const b=e.target.closest('[data-del]'); if(!b||tl===null) return; const [k,i]=b.dataset.del.split(':'); if(cur!==null) finish();
+  const E=editSlot(tl); E[k].splice(+i,1); save(); rebuild(); say('이 시간대에서 지웠습니다.'); };
+let armedTle=0;
+$('tleReset').onclick=()=>{ if(tl===null) return; const now=Date.now(); if(now-armedTle<4000){ cur=null; delete state.tlEdit[tl]; armedTle=0; save(); rebuild(); say('이 시간대를 시나리오 원본으로 되돌렸습니다.'); }
+  else { armedTle=now; say('한 번 더 누르면 이 시간대에서 고친 내용을 모두 버리고 시나리오 원본으로 돌아갑니다.'); } };
+let armedSt=0;
+$('stClear').onclick=()=>{ const now=Date.now(); if(now-armedSt<4000){ state.staff[view]=[]; selStaff=null; armedSt=0; save(); rebuild(); say(`${VIEWS[view].name}의 운영진을 모두 지웠습니다.`); }
+  else { armedSt=now; say(`한 번 더 누르면 ${VIEWS[view].name}의 운영진을 모두 지웁니다.`); } };
 let armedReset=0;
-$('reset').onclick=()=>{ const now=Date.now(); if(now-armedReset<4000){ state=clone(SEED); shown=new Set(); cur=null; selPlace=null; buildSeats(); save(); rebuild(); say('처음 상태로 되돌렸습니다.'); armedReset=0; }
+$('reset').onclick=()=>{ const now=Date.now(); if(now-armedReset<4000){ state=clone(SEED); fixStaff(); selStaff=null; shown=new Set(); cur=null; selPlace=null; buildSeats(); save(); rebuild(); say('처음 상태로 되돌렸습니다.'); armedReset=0; }
   else { armedReset=now; say('한 번 더 누르면 그린 동선과 장소가 모두 처음 상태로 돌아갑니다.'); } };
 
 /* ───────── 실행 ───────── */
