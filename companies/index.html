@@ -8,7 +8,7 @@
 <title>네트워킹 데이 참여기업</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbit&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbit&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
 :root{
   --night:#070c2b; --deep:#0c1645; --line:#1d2a6b; --ink:#eef1ff; --mute:#8f9bd0; --volt:#4c86ff; --glow:#7fe3ff;
@@ -26,8 +26,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 
 /* 표지 */
 .cover{padding-top:40px;padding-bottom:8px}
+.logo{display:block;height:30px;width:auto;margin:0 0 22px}
 .eyebrow{margin:0;font-size:13px;font-weight:500;color:var(--mute)}
-h1{margin:6px 0 0;font:400 40px/1.1 var(--display);letter-spacing:-.5px;word-spacing:-.3em}
+h1{margin:4px 0 0;font:700 46px/1.1 var(--body);letter-spacing:-2px}
 .date{margin:10px 0 0;font:400 16px var(--display);color:var(--glow);letter-spacing:.5px;word-spacing:-.3em}
 
 /* 분야별 블록 */
@@ -78,11 +79,12 @@ mark{background:var(--glow);color:var(--night);border-radius:2px;padding:0 1px}
 .empty{padding:48px 0;text-align:center;color:var(--mute)}
 footer{padding:48px 0 40px;text-align:center;font:400 12px var(--display);letter-spacing:3px;color:var(--mute)}
 @media (prefers-reduced-motion:reduce){.cube{animation:none}.tower{transition:none}}
-@media (min-width:600px){h1{font-size:52px}.legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:600px){h1{font-size:60px}.legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <header class="wrap cover">
+  <img class="logo" src="logo.png" alt="에이전틱 AI 얼라이언스" onerror="this.remove()">
   <p class="eyebrow" id="org"></p>
   <h1 id="title"></h1>
   <p class="date" id="date"></p>
