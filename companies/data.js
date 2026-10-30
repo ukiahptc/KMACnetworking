@@ -20,9 +20,6 @@ const D = {
 };
 
 window.COMPANIES = [
-  { type: "회원사", name: "모비루스", domain: D.log,
-    services: [],
-    needs: [] },
   { type: "회원사", name: "코코넛사일로", domain: D.log,
     services: ["Mobility/Logistics"],
     needs: ["Agentic AI 도입"] },
@@ -48,7 +45,7 @@ window.COMPANIES = [
     services: ["생성형 AI·비전 AI 기반 신발·섬유패션 산업 특화 AI 솔루션 개발", "디자인·개발·품질검사 등 제조 전 과정의 AI 전환 지원"],
     needs: ["신발·섬유패션 제조 데이터 보유 기업과 산업 특화 AI 모델·에이전트, 로봇·설비 연계 기술 기업 간 실증·공동개발 협력"] },
   { type: "회원사", name: "베스핀글로벌주식회사", domain: D.pub,
-    services: ["에이전틱 AI 플랫폼 및 OPS 제품군 보유", "AI 개발 인력 보유"],
+    services: ["에이전틱 AI 플랫폼 및 OPS 제품군 보유", "Git·AI 개발 인력 보유"],
     needs: ["공공·제조·금융 데이터 보유 기업과 협업"] },
   { type: "회원사", name: "NICE지니데이타", domain: D.log,
     services: ["사용자 질문 의도 분석, 데이터 처리 및 심층 탐색 제공 AI 솔루션"],
